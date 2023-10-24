@@ -12,6 +12,7 @@
   <groupId>app.demo</groupId>
   <artifactId>todo</artifactId>
   <version>0.0.1</version>
+  <!--GIT_COMMIT_ID:XXXXXXXXX-->
   <name>todo</name>
   <description>Demo project for Spring Boot (API + FRONTEND)</description>
   <properties>
