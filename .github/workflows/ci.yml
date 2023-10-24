@@ -20,9 +20,9 @@ jobs:
       IS_TAGGED: ${{ steps.version.outputs.IS_TAGGED }}
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
-        fetch-depth: 0
+        fetch-depth: 1
     
     - name: Semver for TODO APP
       uses: PaulHatch/semantic-version@v5.0.3
@@ -45,7 +45,7 @@ jobs:
         # 'changed' output will true. Enter multiple paths separated by spaces.
         change_path: "todo"
         # Named version, will be used as suffix for name version tag (only in multirepos where I would have v1.0.0-api)
-        namespace: ""
+        # namespace: ""
         # If this is set to true, *every* commit will be treated as a new version.
         bump_each_commit: true
         # If true, the body of commits will also be searched for major/minor patterns to determine the version type.
