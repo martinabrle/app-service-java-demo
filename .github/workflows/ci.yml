@@ -106,7 +106,7 @@ jobs:
           fi
           echo "IS_CODE_CHANGED=true" >> $GITHUB_OUTPUT
           
-          if [[ ! -z "${{env.IS_TAGGED}}" ]]; then
+          if [[ "${{env.IS_TAGGED}}" != "false" ]]; then
             echo "App is already tagged. Can not overwrite an existing release"
             exit 1
           fi
