@@ -1,0 +1,19 @@
+{
+  "role": {
+    "name": "Todo App",
+    "instance": "Todo App role Instance"
+  },
+  "instrumentation": {
+    "logging": {
+      "level": "ALL"
+    }
+  },
+  "preview": {
+    "captureLogbackMarker":  true,
+    "captureLog4jMarker":  true,
+    "captureLogbackCodeAttributes": true,
+    "browserSdkLoader": {
+      "enabled": true
+    }
+  }
+}

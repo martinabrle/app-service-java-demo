@@ -1,0 +1,41 @@
+spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE}
+  jpa:
+    open-in-view: false
+server:
+  port: ${PORT}
+  shutdown: graceful
+
+# Spring Boot 1.5 makes actuator secure by default
+management.security.enabled: false
+# Enable all Actuators and not only the two available by default /health and /info starting Spring Boot 2.0
+management.endpoints.web.exposure.include: "*"
+
+# Temporary hack required by the Spring Boot 2 / Spring Cloud Finchley branch
+# Waiting issue https://github.com/spring-projects/spring-boot/issues/13042
+spring.cloud.refresh.refreshable: false
+
+# App settings
+app.demo.todo.load-demo-data: ${LOAD_DEMO_DATA}
+
+# Logging
+logging.level: warn
+logging.level.app.demo.todo: debug
+logging.level.org.springframework: INFO
+
+# Metrics
+management:
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  metrics:
+    export:
+      prometheus:
+        enabled: true

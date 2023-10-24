@@ -1,7 +1,7 @@
 # Spring Boot Todo App on App Service
-## Deployment with full managed identities usage (Bicep)
+## Deployment with full managed identities and VNET usage (Bicep)
 
-![Architecture Diagram](../../diagrams/tiny-java-app-service-managed-identities.png)
+![Architecture Diagram](../../diagrams/tiny-java-app-service-managed-identities-vnet.png)
 
 * Start the command line, clone the repo using ```git clone https://github.com/martinabrle/tiny-java.git``` and change your current directory to ```tiny-java/scripts``` directory:
     ```
@@ -14,7 +14,6 @@
 * Set environment variables:
     ```
     export AZURE_LOG_ANALYTICS_WRKSPC_NAME="{{{REPLACE_WITH_LOG_WORKSPACE_NAME}}}"
-    export AZURE_LOG_ANALYTICS_WRKSPC_SUBSCRIPTION_ID="{{{AZURE_LOG_ANALYTICS_WRKSPC_SUBSCRIPTION_ID}}}"
     export AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP="{{{REPLACE_WITH_LOG_WORKSPACE_RESOURCE_GROUP}}}"
     export ENV_PREFIX="{{{REPLACE_WITH_DEPLOYMENT_PREFIX}}}"
     ```
@@ -112,6 +111,17 @@
     ```
     cd ../todo
     ```
+* Deploy Bastion manually into the newly created VNET (subnet ```AzureBastionSubnet```)
+* Deploy a new Jumpbox into the newly created VNET (subnet ```mgmt```); do not assign nor create any public IP to this VM
+* Remote into the newly created VM and install [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli), [OpenJDK™](https://www.microsoft.com/openjdk) and [git cli](https://git-scm.com/downloads)
+* Start the command line, clone the repo using ```git clone https://github.com/martinabrle/tiny-java.git``` and change your current directory to ```tiny-java/scripts``` directory:
+    ```
+    cd ./tiny-java/scripts
+    ```
+* Log in into Azure from the command line using ```az login``` ([link](https://docs.microsoft.com/en-us/cli/azure/authenticate-azure-cli))
+* List available Azure subscriptions using ```az account list -o table``` ([link](https://docs.microsoft.com/en-us/cli/azure/account#az-account-list))
+* Select an Azure subscription you previously deployed infra into ```az account set -s 00000000-0000-0000-0000-000000000000```
+  ([link](https://docs.microsoft.com/en-us/cli/azure/account#az-account-set)); replace ```00000000-0000-0000-0000-000000000000``` with Azure subscription Id you deployed into
 * Build the app using ```./mvnw clean``` and ```./mvnw build```
 * Configure the application with Maven Plugin by running ```./mvnw com.microsoft.azure:azure-webapp-maven-plugin:2.2.0:config```. This maven goal will first authenticate with Azure and than it will ask you which App Service (or in other words, which Java WebApp) do you want to deploy the app into. Confirm the selection and you will find an updated configuration in the project's ```pom.xml```.
 * Deploy the application by running ```./mvnw azure-webapp:deploy```

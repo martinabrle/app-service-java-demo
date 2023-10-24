@@ -1,0 +1,54 @@
+package app.demo.todo;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+
+import app.demo.todo.utils.AppLogger;
+
+@Configuration
+@ConfigurationProperties(prefix = "app.demo.todo")
+public class AppConfig {
+    public static final AppLogger LOGGER = new AppLogger(AppConfig.class);
+
+    private String loadDemoData;
+    private String debugAuthToken;
+    private String environment;
+
+    public void setLoadDemoData(String loadDemoData) {
+        this.loadDemoData = loadDemoData;
+    }
+
+    public void setDebugAuthToken(String debugAuthToken) {
+        this.debugAuthToken = debugAuthToken;
+    }
+
+    public void setEnvironment(String environment) {
+        this.environment = environment;
+    }
+
+    public boolean getLoadDemoData() {
+        return loadDemoData != null && loadDemoData.toLowerCase().trim().equals("true");
+    }
+
+    public boolean getDebugAuthToken() {
+        return debugAuthToken != null && debugAuthToken.toLowerCase().trim().equals("true");
+    }
+
+    public String getVersion() {
+        String version = "Unknown";
+        try {
+            version = this.getClass().getPackage().getImplementationVersion();
+        } catch (Exception ignoreException) {
+            LOGGER.error("An error has occurred while trying to retrieve the package version.");
+        }
+        return version;
+    }
+
+    public String getEnvironment() {
+        if (environment == null || environment.isEmpty()) {
+            return "Unknown";
+        }
+        return environment;
+    }
+    
+}

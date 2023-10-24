@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    username: ${SPRING_DATASOURCE_USERNAME}
+    jdbc-url: ${SPRING_DATASOURCE_URL}?sslmode=verify-full&sslrootcert=DigiCertGlobalRootCA.crt.pem
+    azure.passwordless-enabled: true
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: ${SPRING_DATASOURCE_SHOW_SQL}
+    hibernate:
+      ddl-auto: validate
