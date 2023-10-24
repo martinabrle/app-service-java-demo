@@ -138,10 +138,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Azure login
-        uses: azure/login@v1
-        with:
-          creds: ${{secrets.AZURE_CREDENTIALS}}
+      # - name: Azure login
+      #   uses: azure/login@v1
+      #   with:
+      #     creds: ${{secrets.AZURE_CREDENTIALS}}
 
       - name: Set default Azure subscription
         run: az account set -s ${{secrets.AZURE_SUBSCRIPTION_ID}}
