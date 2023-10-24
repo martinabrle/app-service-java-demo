@@ -57,4 +57,4 @@ buildNumber.properties
 # App specific
 assign_privileges.sql
 create_user.sql
-#deploy.sh
+deploy.sh
