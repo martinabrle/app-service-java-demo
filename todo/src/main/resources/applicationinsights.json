@@ -1,7 +1,7 @@
 {
   "role": {
     "name": "Todo App",
-    "instance": "Todo App role Instance"
+    "instance": "Todo App role instance"
   },
   "instrumentation": {
     "logging": {
