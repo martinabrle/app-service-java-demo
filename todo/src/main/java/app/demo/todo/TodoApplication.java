@@ -5,20 +5,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.microsoft.applicationinsights.attach.ApplicationInsights;
 
-import app.demo.todo.utils.AppEnvironment;
 import app.demo.todo.utils.AppLogger;
-import app.demo.todo.utils.FileCache;
 
 @SpringBootApplication
 public class TodoApplication {
 
 	public static final AppLogger LOGGER = new AppLogger(TodoApplication.class);
-
-	// TODO: remove
-	// public static final String CURRENT_DIR =
-	// AppEnvironment.GetCurrentDirectory();
-	// public static final String CURRENT_SYSTEM_DIR =
-	// AppEnvironment.GetSystemCurrentDirectory();
 
 	private static boolean STARTUP_FINISHED = false;
 
