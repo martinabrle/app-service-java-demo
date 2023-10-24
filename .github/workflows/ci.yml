@@ -23,9 +23,10 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 1
+        fetch-tags: true
     
     - name: Semver for TODO APP
-      uses: PaulHatch/semantic-version@v5.0.3
+      uses: PaulHatch/semantic-version@v5.2.3
       id: semver_version
       with:
         # The prefix to use to identify tags
