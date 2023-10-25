@@ -30,16 +30,6 @@
       <artifactId>applicationinsights-runtime-attach</artifactId>
       <version>3.4.17</version>
     </dependency>
-    <!-- <dependency>
-      <groupId>com.azure</groupId>
-      <artifactId>azure-identity</artifactId>
-      <version>1.5.4</version>
-    </dependency> -->
-    <!-- <dependency>
-      <groupId>com.microsoft.azure</groupId>
-      <artifactId>applicationinsights-spring-boot-starter</artifactId>
-      <version>2.6.4</version>
-    </dependency> -->
     <dependency>
       <groupId>org.springdoc</groupId>
       <artifactId>springdoc-openapi-ui</artifactId>
@@ -61,11 +51,13 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
-    <!-- <dependency>
+    <!-- Use this if running on-prem with a username/password and AAD integration is not required -->
+    <!--
+    <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <scope>runtime</scope>
-    </dependency> -->
+    </dependency>-->
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
