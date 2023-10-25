@@ -24,7 +24,7 @@ logging.level: warn
 logging.level.app.demo.todo: debug
 logging.level.org.springframework: INFO
 
-# Metrics
+# Metrics, Health and Info
 management:
   endpoint:
     metrics:
@@ -35,7 +35,16 @@ management:
     web:
       exposure:
         include: '*'
+    health:
+      show-details: always
+      probes:
+        enabled: true
   metrics:
     export:
       prometheus:
         enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
