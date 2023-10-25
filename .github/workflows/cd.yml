@@ -30,7 +30,7 @@ jobs:
     # when called from another workflow directly, it inherits the event name from the caller workflow
     # (push in this case when called from ci.yml)
     runs-on: ubuntu-latest
-    if: ${{ startsWith(github.ref, 'refs/tags/v') || startsWith(inputs.version,'v') }} 
+    if: ${{ startsWith(github.ref, 'refs/tags/v') || ((github.event_name == 'workflow_dispatch' || github.event_name == 'workflow_call' || (github.event_name == 'push' && github.ref == 'refs/heads/main')) && startsWith(inputs.version,'v')) }} 
     outputs:
       RELEASE_VERSION: ${{ steps.init.outputs.RELEASE_VERSION }}
       RELEASE_VERSION_NUMBER: ${{ steps.init.outputs.RELEASE_VERSION_NUMBER }}
@@ -44,11 +44,11 @@ jobs:
           releaseVersion=""
           if [[ "${{github.event_name}}" == "workflow_dispatch" ]]; then
             releaseVersion="${{inputs.version}}" 
-          elif [[ "${{inputs.version}}" = "workflow_call" ]]; then
+          elif [[ "${{github.event_name}}" == "workflow_call" ]]; then
             releaseVersion="${{inputs.version}}" 
           elif [[ "${{github.event_name}}" == "release" ]]; then
             releaseVersion="${{github.event.release.tag_name}}" 
-          elif [[ "${{inputs.version}}" = v* ]]; then
+          elif [[ "${{github.event_name}}" == "push" ]]; then
             releaseVersion="${{inputs.version}}" 
           else
             echo "Unknown trigger: '${{github.event_name}}'"

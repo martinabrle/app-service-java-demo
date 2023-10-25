@@ -213,4 +213,4 @@ jobs:
     needs: [version, release]
     uses: ./.github/workflows/cd.yml
     with:
-      version: ${{needs.version.outputs.VERSION}}
+      version: ${{needs.version.outputs.VERSION_TAG}}
