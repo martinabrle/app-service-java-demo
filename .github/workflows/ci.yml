@@ -180,6 +180,7 @@ jobs:
     permissions:
       contents: write
       packages: write
+      actions: write
 
     env:
       VERSION: ${{ needs.version.outputs.VERSION }}
