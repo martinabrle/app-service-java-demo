@@ -165,7 +165,7 @@ jobs:
           echo "RELEASE_NAME=todo-${{env.VERSION}}" >> $GITHUB_OUTPUT
           
       - name: 'Upload build artifact'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: todo-${{env.VERSION}}
           path: ./todo/todo-${{env.VERSION}}.zip
@@ -213,4 +213,4 @@ jobs:
     needs: [version, release]
     uses: ./.github/workflows/cd.yml
     with:
-      version: "v1.0.28"
+      version: ${{needs.version.outputs.VERSION}}
