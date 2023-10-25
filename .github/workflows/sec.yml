@@ -34,6 +34,13 @@ jobs:
         uses: snyk/actions/maven-3-jdk-11@master
         env:
             SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        continue-on-error: true
+        with:
+            args: ./todo --sarif-file-output=snyk.sarif
+      - name: Upload result to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+            sarif_file: snyk.sarif
   dast:
     runs-on: ubuntu-latest
     steps:
@@ -53,7 +60,7 @@ jobs:
         run: curl -s localhost:8080/info
      
       - name: Run ZAP OWASP full scan
-        uses: zaproxy/action-full-scan@v0.4.0
+        uses: zaproxy/action-full-scan@v0.7.0
         with:
           docker_name: 'owasp/zap2docker-stable'
           token: ${{ secrets.GITHUB_TOKEN }}
