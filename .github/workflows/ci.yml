@@ -210,6 +210,6 @@ jobs:
           gh release create ${{env.VERSION_TAG}} ./todo-${{env.VERSION}}.zip --notes "Auto release ${{env.VERSION_TAG}}"
       
       - name: Deploy
-        uses: ./.github/workflows/cd.yml@main
+        uses: ./.github/workflows/cd.yml
         with:
           version: ${{env.VERSION}}
