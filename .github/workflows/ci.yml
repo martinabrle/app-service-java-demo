@@ -165,7 +165,7 @@ jobs:
           echo "RELEASE_NAME=todo-${{env.VERSION}}" >> $GITHUB_OUTPUT
           
       - name: 'Upload build artifact'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: todo-${{env.VERSION}}
           path: ./todo/todo-${{env.VERSION}}.zip
@@ -179,6 +179,8 @@ jobs:
     #permissions: write-all
     permissions:
       contents: write
+      packages: write
+      actions: write
 
     env:
       VERSION: ${{ needs.version.outputs.VERSION }}
@@ -191,7 +193,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: ${{env.RELEASE_NAME}}
       
@@ -202,7 +204,15 @@ jobs:
       
       - name: Release APP
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GH_TOKEN_RELEASE
         run: |
           ls -la ./todo-${{env.VERSION}}.zip
           gh release create ${{env.VERSION_TAG}} ./todo-${{env.VERSION}}.zip --notes "Auto release ${{env.VERSION_TAG}}"
+  
+  deploy:
+    needs: [version, release]
+    uses: ./.github/workflows/cd.yml
+    with:
+      version: ${{needs.version.outputs.VERSION_TAG}}
+    secrets: inherit
+

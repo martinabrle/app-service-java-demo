@@ -1,18 +1,37 @@
 name: cd
 
+#todo: would be great to modify all the bash shell script and this deployment action to accept --
 on:
-  release:
-    types: [published]
+  # release: - causes problem with az login with a federated identity
+  #   types: [released]
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       version:
         required: true
+        type: string
         description: Full version tag (e.g. "v1.0.5")
 
 jobs:
+  # for debugging purposes only
+  # preinit:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: "preinit"
+  #       run: |
+  #         echo "github.ref: ${{github.ref}}"
+  #         echo "github.event_name: ${{github.event_name}}"
+  #         echo "inputs.version: ${{inputs.version}} "
+
   init:
+    # when called from another workflow directly, it inherits the event name from the caller workflow
+    # (push in this case when called from ci.yml)
     runs-on: ubuntu-latest
-    if: ${{ startsWith(github.ref, 'refs/tags/v') }} 
+    if: ${{ startsWith(github.ref, 'refs/tags/v') || ((github.event_name == 'workflow_dispatch' || github.event_name == 'workflow_call' || (github.event_name == 'push' && github.ref == 'refs/heads/main')) && startsWith(inputs.version,'v')) }} 
     outputs:
       RELEASE_VERSION: ${{ steps.init.outputs.RELEASE_VERSION }}
       RELEASE_VERSION_NUMBER: ${{ steps.init.outputs.RELEASE_VERSION_NUMBER }}
@@ -26,8 +45,12 @@ jobs:
           releaseVersion=""
           if [[ "${{github.event_name}}" == "workflow_dispatch" ]]; then
             releaseVersion="${{inputs.version}}" 
+          elif [[ "${{github.event_name}}" == "workflow_call" ]]; then
+            releaseVersion="${{inputs.version}}" 
           elif [[ "${{github.event_name}}" == "release" ]]; then
             releaseVersion="${{github.event.release.tag_name}}" 
+          elif [[ "${{github.event_name}}" == "push" ]]; then
+            releaseVersion="${{inputs.version}}" 
           else
             echo "Unknown trigger: '${{github.event_name}}'"
             exit 1
@@ -64,7 +87,7 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - name: Azure login
+      - name: Azure login # https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure
         uses: azure/login@v1
         with:
             client-id: ${{ secrets.AAD_CLIENT_ID }}
@@ -151,7 +174,7 @@ jobs:
         if: ${{ steps.init.outputs.ENVIRONMENT_DEPLOYED == 'true' }}
         run: |
           export PGPASSWORD=`az account get-access-token --resource-type oss-rdbms --query "[accessToken]" --output tsv`
-          psql --set=sslmode=require -h ${{secrets.PGSQL_NAME}}.postgres.database.azure.com -p 5432 -d ${{secrets.DB_NAME_STAGING}} -U "${{secrets.DBA_GROUP_NAME}}" --file=./${{env.RELEASE_DIR_NAME}}/scripts/db.sql -v ON_ERROR_STOP=1
+          psql --set=sslmode=require -h ${{secrets.PGSQL_NAME}}.postgres.database.azure.com -p 5432 -d ${{secrets.DB_NAME_STAGING}} -U "${{secrets.DBA_GROUP_NAME}}" --file=./${{env.RELEASE_DIR_NAME}}/scripts/create_todo_table.sql -v ON_ERROR_STOP=1
       
       - name: Grant AppService staging slot DB user rights
         run: |
@@ -194,7 +217,7 @@ jobs:
       - name: Remove DB Firewall exception used for Schema sync
         if: ${{ steps.init.outputs.ENVIRONMENT_DEPLOYED == 'true' }}
         run: |
-          az postgres flexible-server firewall-rule delete --rule-name "AllowDeploymentClientIP" -g ${{secrets.PGSQL_RESOURCE_GROUP}} --name ${{secrets.PGSQL_NAME}} --yes
+          az postgres flexible-server firewall-rule delete --rule-name "AllowDeploymentClientIP" -g ${{secrets.PGSQL_RESOURCE_GROUP}} --name ${{secrets.PGSQL_NAME}} --subscription "${{secrets.PGSQL_SUBSCRIPTION_ID}}" --yes
       
       - name: Run INTEGRATION tests on the staging slot
         if: ${{ steps.init.outputs.ENVIRONMENT_DEPLOYED == 'true' }}

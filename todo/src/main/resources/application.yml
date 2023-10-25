@@ -24,17 +24,35 @@ logging.level: warn
 logging.level.app.demo.todo: debug
 logging.level.org.springframework: INFO
 
-# Metrics
+# Metrics, Health and Info
 management:
   endpoint:
     metrics:
       enabled: true
     prometheus:
       enabled: true
-  endpoints:
-    web:
-      exposure:
-        include: '*'
+    info:
+      enabled: true
+    health:
+      show-details: always
+      group:
+        liveness:
+          include: '*'
+        readiness:
+          include: '*'
+      probes:
+        enabled: true
+  # I'm sure I will understand Actuator one day. Today is not that day.
+  # endpoints:
+  #   web:
+  #     exposure:
+  #       include: '*'
+  #   health:
+  #     show-details: always
+  #     probes:
+  #       enabled: true
+  #     live-state:
+  #       enabled: true
   metrics:
     export:
       prometheus:
