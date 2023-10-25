@@ -39,7 +39,9 @@ jobs:
         # Runs Snyk Open Source (SCA) analysis and uploads result to Snyk.
       - name: Snyk Open Source monitor
         run: cd todo && snyk monitor --all-projects
-
+        env:
+            SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+            continue-on-error: true
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v2
         with:
