@@ -177,10 +177,10 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{contains(needs.version.outputs.IS_CHANGED, true)}}
     #permissions: write-all
-    permissions:
-      contents: write
-      packages: write
-      actions: write
+    # permissions:
+    #   contents: write
+    #   packages: write
+    #   actions: write
 
     env:
       VERSION: ${{ needs.version.outputs.VERSION }}
@@ -204,7 +204,7 @@ jobs:
       
       - name: Release APP
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN_RELEASE }}
         run: |
           ls -la ./todo-${{env.VERSION}}.zip
           gh release create ${{env.VERSION_TAG}} ./todo-${{env.VERSION}}.zip --notes "Auto release ${{env.VERSION_TAG}}"
