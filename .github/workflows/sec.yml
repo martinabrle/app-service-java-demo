@@ -68,4 +68,4 @@ jobs:
       - name: stop docker
         if: always()
         run: |
-            cd scripts/dast && docker compose down && docker rm todo-app && docker container prune --force && docker image prune --force
+            cd scripts/dast && docker compose down && docker container prune --force && docker image prune --force
