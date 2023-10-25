@@ -34,7 +34,14 @@ management:
     info:
       enabled: true
     health:
-      enabled: true
+      show-details: always
+      group:
+        liveness:
+          include: '*'
+        readiness:
+          include: '*'
+      probes:
+        enabled: true
   endpoints:
     web:
       exposure:
@@ -43,12 +50,9 @@ management:
       show-details: always
       probes:
         enabled: true
+      live-state:
+        enabled: true
   metrics:
     export:
       prometheus:
         enabled: true
-  health:
-    livenessstate:
-      enabled: true
-    readinessstate:
-      enabled: true
