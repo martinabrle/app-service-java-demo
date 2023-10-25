@@ -17,6 +17,15 @@ on:
         description: Full version tag (e.g. "v1.0.5")
 
 jobs:
+  preinit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "preinit"
+        run: |
+          echo "github.ref: ${{github.ref}}"
+          echo "github.event_name: ${{github.event_name}}"
+          echo "inputs.version: ${{inputs.version}} "
+
   init:
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.ref, 'refs/tags/v') || ((github.event_name == 'workflow_dispatch' || github.event_name == 'workflow_call') && startsWith(inputs.version,'v')) }} 
