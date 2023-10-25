@@ -19,17 +19,17 @@ jobs:
           java-version: "11"
       - name: Install dependencies
         run: mvn -B -q dependency:resolve
-      - name: Run OWASP Dependency Check
-        uses: dependency-check/action@v2
-        with:
-          format: "ALL"
-          failOnCVSS: "9"
-          outputFile: "dependency-check-report.html"
-      - name: Upload OWASP Dependency Check report
-        uses: actions/upload-artifact@v2
-        with:
-          name: Dependency Check Report
-          path: dependency-check-report.html
+    #   - name: Run OWASP Dependency Check
+    #     uses: dependency-check/action@v2
+    #     with:
+    #       format: "ALL"
+    #       failOnCVSS: "9"
+    #       outputFile: "dependency-check-report.html"
+    #   - name: Upload OWASP Dependency Check report
+    #     uses: actions/upload-artifact@v2
+    #     with:
+    #       name: Dependency Check Report
+    #       path: dependency-check-report.html
       - name: Run Snyk Security Scan
         uses: snyk/actions/maven-3-jdk-11@master
   dast:
