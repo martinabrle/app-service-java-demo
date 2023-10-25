@@ -1,0 +1,76 @@
+name: DevSecOps Security Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  security_scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: "11"
+      - name: Install dependencies
+        run: mvn -B -q dependency:resolve
+      - name: Run OWASP Dependency Check
+        uses: dependency-check/action@v2
+        with:
+          format: "ALL"
+          failOnCVSS: "9"
+          outputFile: "dependency-check-report.html"
+      - name: Upload OWASP Dependency Check report
+        uses: actions/upload-artifact@v2
+        with:
+          name: Dependency Check Report
+          path: dependency-check-report.html
+      - name: Run Snyk Security Scan
+        uses: snyk/actions/scan@v3
+        with:
+          file: "pom.xml"
+          fail-on: "high"
+          print-deps: "false"
+          severity-threshold: "high"
+  sast:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: "11"
+      - name: build
+        run: cd todo && .mvnw clean package -DskipTests
+      - run: cd scripts/dast && docker compose up -d
+      - name: wait for container to start
+        run: timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:8080/info)" != "200" ]]; do sleep 5; done' || false
+
+      - name: test container
+        run: curl -s localhost:8080/info
+     
+      - name: Run ZAP OWASP full scan
+        uses: zaproxy/action-full-scan@v0.4.0
+        with:
+          docker_name: 'owasp/zap2docker-stable'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target: 'http://localhost:8080'
+          cmd_options: '-a -j -l WARN -z "-addoninstallall" '
+          allow_issue_writing: false
+
+      - name: Upload html report
+        uses: actions/upload-artifact@v3
+        with:
+          name: DAST_Report.html
+          path: report_html.html
+
+      - name: stop docker
+        if: always()
+        run: |
+          docker compose down && docker rm todo-app && docker container prune --force && docker image prune --force

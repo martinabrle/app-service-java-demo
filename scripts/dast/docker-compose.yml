@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: todo-app
+    build:
+      context: ../../
+      dockerfile: scripts/dast/Dockerfile
+    environment:
+      LOAD_DEMO_DATA: 'true'
+      PORT: 80
+      SPRING_PROFILES_ACTIVE: local
+      SPRING_DATASOURCE_SHOW_SQL: 'true'
+
+    ports:
+      - 8080:80
