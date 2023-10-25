@@ -208,7 +208,10 @@ jobs:
         run: |
           ls -la ./todo-${{env.VERSION}}.zip
           gh release create ${{env.VERSION_TAG}} ./todo-${{env.VERSION}}.zip --notes "Auto release ${{env.VERSION_TAG}}"
-      
-      - uses: martinabrle/app-service-java-demo/.github/workflows/cd.yml
-        with:
-          version: ${{env.VERSION}}
+  
+  deploy:
+    needs: [version, release]
+    if: ${{contains(needs.version.outputs.IS_CHANGED, true)}}
+    uses: ./.github/workflows/cd.yml
+    with:
+      version: ${{ needs.version.outputs.VERSION }}
