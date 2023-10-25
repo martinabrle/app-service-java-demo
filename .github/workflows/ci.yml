@@ -211,7 +211,6 @@ jobs:
   
   deploy:
     needs: [version, release]
-    if: ${{contains(needs.version.outputs.IS_CHANGED, true)}}
     uses: ./.github/workflows/cd.yml
     with:
-      version: ${{ needs.version.outputs.VERSION }}
+      version: "v1.0.28"
