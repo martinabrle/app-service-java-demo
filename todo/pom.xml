@@ -58,6 +58,7 @@
       <artifactId>postgresql</artifactId>
       <scope>runtime</scope>
     </dependency>-->
+    <!-- there is currently a dispute about the following "vulneribility", but the author does not want to fill-in the dispute form-->
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
