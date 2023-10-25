@@ -1,0 +1,104 @@
+name: DevSecOps Security Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sast:
+    permissions:
+        contents: read # for actions/checkout to fetch code
+        security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+        actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: "11"
+      - name: Install dependencies
+        run: cd todo && ./mvnw clean package -DskipTests
+      - uses: snyk/actions/setup@master
+        env:
+            SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}    #   - name: Run OWASP Dependency Check
+    #     uses: dependency-check/action@v2
+    #     with:
+    #       format: "ALL"
+    #       failOnCVSS: "9"
+    #       outputFile: "dependency-check-report.html"
+    #   - name: Upload OWASP Dependency Check report
+    #     uses: actions/upload-artifact@v2
+    #     with:
+    #       name: Dependency Check Report
+    #       path: dependency-check-report.html
+      - name: Snyk Code test
+        run: snyk code test --sarif > snyk-code.sarif || true
+        env:
+            SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        continue-on-error: true
+        # Runs Snyk Open Source (SCA) analysis and uploads result to Snyk.
+      - name: Snyk Open Source monitor
+        run: snyk monitor --all-projects
+        env:
+            SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        continue-on-error: true
+      - name: Upload result to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+            sarif_file: ./todo/snyk-code.sarif
+  dast:
+    permissions:
+        contents: read # for actions/checkout to fetch code
+        security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+        actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: "11"
+      - name: build
+        run: cd todo && ./mvnw clean package -DskipTests
+      - run: cd scripts/dast && docker compose up -d
+      - name: wait for container to start
+        run: timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:8080/info)" != "200" ]]; do sleep 5; done' || false
+
+      - name: test container
+        run: curl -s localhost:8080/info
+     
+      - name: Run ZAP OWASP full scan
+        uses: zaproxy/action-full-scan@v0.7.0
+        with:
+          docker_name: 'owasp/zap2docker-stable'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target: 'http://localhost:8080'
+          cmd_options: '-a -l WARN' # -j -z "-addoninstallall" '
+          allow_issue_writing: false
+
+      - name: Upload html report
+        uses: actions/upload-artifact@v3
+        with:
+          name: DAST_Report.html
+          path: report_html.html
+
+      - name: Create sarif file from zaproxy results
+        uses: SvanBoxel/zaproxy-to-ghas@main
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: results.sarif
+
+      - name: stop docker
+        if: always()
+        run: |
+            cd scripts/dast && docker compose down && docker container prune --force && docker image prune --force
