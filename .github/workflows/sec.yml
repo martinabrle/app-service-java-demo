@@ -39,7 +39,7 @@ jobs:
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v2
         with:
-            sarif_file: snyk.sarif
+            sarif_file: ./todo/snyk.sarif
   dast:
     runs-on: ubuntu-latest
     steps:
@@ -64,7 +64,7 @@ jobs:
           docker_name: 'owasp/zap2docker-stable'
           token: ${{ secrets.GITHUB_TOKEN }}
           target: 'http://localhost:8080'
-          cmd_options: '-a -j -l WARN -z "-addoninstallall" '
+          cmd_options: '-a -l WARN' # -j -z "-addoninstallall" '
           allow_issue_writing: false
 
       - name: Upload html report
