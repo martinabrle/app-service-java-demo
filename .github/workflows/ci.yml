@@ -179,6 +179,7 @@ jobs:
     #permissions: write-all
     permissions:
       contents: write
+      packages: write
 
     env:
       VERSION: ${{ needs.version.outputs.VERSION }}
