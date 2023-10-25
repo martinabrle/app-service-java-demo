@@ -214,3 +214,5 @@ jobs:
     uses: ./.github/workflows/cd.yml
     with:
       version: ${{needs.version.outputs.VERSION_TAG}}
+    secrets: inherit
+
