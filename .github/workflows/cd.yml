@@ -17,14 +17,15 @@ on:
         description: Full version tag (e.g. "v1.0.5")
 
 jobs:
-  preinit:
-    runs-on: ubuntu-latest
-    steps:
-      - name: "preinit"
-        run: |
-          echo "github.ref: ${{github.ref}}"
-          echo "github.event_name: ${{github.event_name}}"
-          echo "inputs.version: ${{inputs.version}} "
+  # for debugging purposes only
+  # preinit:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: "preinit"
+  #       run: |
+  #         echo "github.ref: ${{github.ref}}"
+  #         echo "github.event_name: ${{github.event_name}}"
+  #         echo "inputs.version: ${{inputs.version}} "
 
   init:
     # when called from another workflow directly, it inherits the event name from the caller workflow
