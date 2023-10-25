@@ -32,6 +32,8 @@ jobs:
     #       path: dependency-check-report.html
       - name: Run Snyk Security Scan
         uses: snyk/actions/maven-3-jdk-11@master
+        env:
+            SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
   dast:
     runs-on: ubuntu-latest
     steps:
