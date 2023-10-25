@@ -1,0 +1,202 @@
+name: cd
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        required: true
+        description: Full version tag (e.g. "v1.0.5")
+
+jobs:
+  init:
+    runs-on: ubuntu-latest
+    if: ${{ startsWith(github.ref, 'refs/tags/v') }} 
+    outputs:
+      RELEASE_VERSION: ${{ steps.init.outputs.RELEASE_VERSION }}
+      RELEASE_VERSION_NUMBER: ${{ steps.init.outputs.RELEASE_VERSION_NUMBER }}
+      RELEASE_DIR_NAME: ${{ steps.init.outputs.RELEASE_DIR_NAME }}
+      RELEASE_ARCHIVE_NAME: ${{ steps.init.outputs.RELEASE_ARCHIVE_NAME }}
+      RELEASE_FILE_NAME: ${{ steps.init.outputs.RELEASE_FILE_NAME }}
+    steps:
+      - name: Init
+        id: init
+        run: |
+          releaseVersion=""
+          if [[ "${{github.event_name}}" == "workflow_dispatch" ]]; then
+            releaseVersion="${{inputs.version}}" 
+          elif [[ "${{github.event_name}}" == "release" ]]; then
+            releaseVersion="${{github.event.release.tag_name}}" 
+          else
+            echo "Unknown trigger: '${{github.event_name}}'"
+            exit 1
+          fi
+          echo "Release version to deploy: ${releaseVersion}"
+
+          if [[ ${releaseVersion::1} == "v" ]]; then
+            releaseVersionNumber="${releaseVersion:1}"
+          else
+            releaseVersionNumber="${releaseVersion}"
+          fi
+
+          echo "Release version number to deploy: ${releaseVersionNumber}"
+
+          echo "RELEASE_VERSION=${releaseVersion}" >> $GITHUB_OUTPUT
+          echo "RELEASE_VERSION_NUMBER=${releaseVersionNumber}" >> $GITHUB_OUTPUT
+          echo "RELEASE_DIR_NAME=todo-${releaseVersionNumber}" >> $GITHUB_OUTPUT
+          echo "RELEASE_ARCHIVE_NAME=todo-${releaseVersionNumber}.zip" >> $GITHUB_OUTPUT
+          echo "RELEASE_FILE_NAME=todo-${releaseVersionNumber}.jar" >> $GITHUB_OUTPUT
+
+
+  deploy:
+    needs: [init]
+    runs-on: ubuntu-latest
+    # demonstrate if-condition on the job level:
+    if: ${{ contains(needs.init.outputs.RELEASE_VERSION,'v')}}
+    env:
+      RELEASE_VERSION: ${{ needs.init.outputs.RELEASE_VERSION }}
+      RELEASE_VERSION_NUMBER: ${{ needs.init.outputs.RELEASE_VERSION_NUMBER }}
+      RELEASE_DIR_NAME: ${{ needs.init.outputs.RELEASE_DIR_NAME }}
+      RELEASE_ARCHIVE_NAME: ${{ needs.init.outputs.RELEASE_ARCHIVE_NAME }}
+      RELEASE_FILE_NAME: ${{ needs.init.outputs.RELEASE_FILE_NAME }}
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+            client-id: ${{ secrets.AAD_CLIENT_ID }}
+            tenant-id: ${{ secrets.AAD_TENANT_ID }}
+            subscription-id: ${{ secrets.APP_SERVICE_SUBSCRIPTION_ID }}
+
+      - name: Init
+        id: init
+        run: |
+          RG_EXISTS=$(az group exists --name ${{secrets.APP_SERVICE_RESOURCE_GROUP}} --subscription ${{secrets.APP_SERVICE_SUBSCRIPTION_ID}})
+          if [[ "$RG_EXISTS" == "true" ]]; then
+            echo "ENVIRONMENT_DEPLOYED=true" >> $GITHUB_OUTPUT
+          else
+            echo "ENVIRONMENT_DEPLOYED=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Display environment status
+        run: echo "${{steps.init.outputs.ENVIRONMENT_DEPLOYED}}"
+      
+      - uses: robinraju/release-downloader@v1.7
+        if: ${{ steps.init.outputs.ENVIRONMENT_DEPLOYED == 'true' }}
+        with:
+          tag: ${{env.RELEASE_VERSION}}
+          fileName: "${{env.RELEASE_ARCHIVE_NAME}}"
+      
+      - name: Check downloaded files
+        if: ${{ steps.init.outputs.ENVIRONMENT_DEPLOYED == 'true' }}
+        run: |
+          pwd
+          ls -la
+          if [[ ! -f "${{env.RELEASE_ARCHIVE_NAME}}" ]]; then
+            echo "'${{env.RELEASE_ARCHIVE_NAME}}' does not exist."
+            exit 1
+          fi
+      
+      - name: Unzip archive
+        if: ${{ steps.init.outputs.ENVIRONMENT_DEPLOYED == 'true' }}
+        run: |
+          echo "Unzipping the release archive file: ${{env.RELEASE_ARCHIVE_NAME}}"
+          unzip ${{env.RELEASE_ARCHIVE_NAME}}
+          if [[ ! -f "${{env.RELEASE_DIR_NAME}}/${{env.RELEASE_FILE_NAME}}" ]]; then
+            echo "'${{env.RELEASE_DIR_NAME}}/${{env.RELEASE_FILE_NAME}}' does not exist."
+            exit 1
+          fi
+      
+      - name: Initialize deployment variables
+        if: ${{ steps.init.outputs.ENVIRONMENT_DEPLOYED == 'true' }}
+        id: vars
+        run: |
+          clientIP=`dig +short myip.opendns.com @resolver1.opendns.com.`
+          echo "DEPLOYMENT_CLIENT_IP=${clientIP}" >> $GITHUB_OUTPUT
+          echo "Client IP: $clientIP"
+
+          if [[ -z "${{secrets.DBA_GROUP_NAME}}" ]]; then
+            echo "DBA Group name is not set"
+            exit 1
+          fi
+
+          dbaGroupId=`az ad group show --group "${{secrets.DBA_GROUP_NAME}}" --query '[id]' -o tsv`
+          echo "DBA Group Name: '${{secrets.DBA_GROUP_NAME}}'"
+          echo "DBA Group Id: $dbaGroupId"
+          echo "DBA_GROUP_ID=${dbaGroupId}" >> $GITHUB_OUTPUT
+          
+          dbAppUserName=`echo "${{secrets.APP_SERVICE_NAME}}" | tr '-' '_'`;
+          echo "DB_APP_USER_NAME=${dbAppUserName}" >> $GITHUB_OUTPUT
+          echo "App user name: $dbAppUserName"
+          
+          dbStagingAppUserName=`echo "${{secrets.APP_SERVICE_NAME}}-staging" | tr '-' '_'`;
+          echo "DB_STAGING_APP_USER_NAME=${dbStagingAppUserName}" >> $GITHUB_OUTPUT
+          echo "Staging app user name: $dbStagingAppUserName"
+      
+      - name: Switch to PGSQL's Azure SubscriptionId
+        if: ${{ steps.init.outputs.ENVIRONMENT_DEPLOYED == 'true' }}
+        run: |
+          az account set -s "${{secrets.PGSQL_SUBSCRIPTION_ID}}" 
+      
+      - name: Add DB Firewall exception used for Schema sync
+        if: ${{ steps.init.outputs.ENVIRONMENT_DEPLOYED == 'true' }}
+        run: |
+          # TODO: subscriptionId (?)
+          az postgres flexible-server firewall-rule create --rule-name "AllowDeploymentClientIP" --resource-group ${{secrets.PGSQL_RESOURCE_GROUP}} --name ${{secrets.PGSQL_NAME}} --start-ip-address ${{steps.vars.outputs.DEPLOYMENT_CLIENT_IP}}
+      
+      - name: Synchronize DB Schema
+        if: ${{ steps.init.outputs.ENVIRONMENT_DEPLOYED == 'true' }}
+        run: |
+          export PGPASSWORD=`az account get-access-token --resource-type oss-rdbms --query "[accessToken]" --output tsv`
+          psql --set=sslmode=require -h ${{secrets.PGSQL_NAME}}.postgres.database.azure.com -p 5432 -d ${{secrets.DB_NAME_STAGING}} -U "${{secrets.DBA_GROUP_NAME}}" --file=./${{env.RELEASE_DIR_NAME}}/scripts/db.sql -v ON_ERROR_STOP=1
+      
+      - name: Grant AppService staging slot DB user rights
+        run: |
+          export PGPASSWORD=`az account get-access-token --resource-type oss-rdbms --query "[accessToken]" --output tsv`
+          ./${{env.RELEASE_DIR_NAME}}/scripts/grant_aad_app_user_rights.sh -s ${{secrets.PGSQL_NAME}} \
+                                                                           -d ${{secrets.DB_NAME_STAGING}} \
+                                                                           -a "${{secrets.DBA_GROUP_NAME}}" \
+                                                                           -n ${{steps.vars.outputs.DB_STAGING_APP_USER_NAME}}
+        
+      - name: Switch to AppService's Azure SubscriptionId
+        if: ${{ steps.init.outputs.ENVIRONMENT_DEPLOYED == 'true' }}
+        run: |
+          az account set -s "${{secrets.APP_SERVICE_SUBSCRIPTION_ID}}"
+        
+      - name: Start the STAGING slot
+        if: ${{ steps.init.outputs.ENVIRONMENT_DEPLOYED == 'true' }}
+        run: |
+          az webapp start -g ${{secrets.APP_SERVICE_RESOURCE_GROUP}} -n ${{secrets.APP_SERVICE_NAME}} --slot staging
+
+      - name: Deploy to STAGING AppService
+        if: ${{ steps.init.outputs.ENVIRONMENT_DEPLOYED == 'true' }}
+        run: |
+          ls -la ./${{env.RELEASE_DIR_NAME}}/${{env.RELEASE_FILE_NAME}}
+          az webapp deploy -g ${{secrets.APP_SERVICE_RESOURCE_GROUP}} --name ${{secrets.APP_SERVICE_NAME}} --slot staging --type jar --src-path ./${{env.RELEASE_DIR_NAME}}/${{env.RELEASE_FILE_NAME}}
+
+      - name: Wait for STAGING AppService to restart and warm-up
+        if: ${{ steps.init.outputs.ENVIRONMENT_DEPLOYED == 'true' }}
+        run: |
+          ./${{env.RELEASE_DIR_NAME}}/scripts/warm_up_wait.sh -u https://${{secrets.APP_SERVICE_NAME}}-staging.azurewebsites.net/actuator/health/readiness
+
+      - name: Set STAGING AppService Liveness probe
+        if: ${{ steps.init.outputs.ENVIRONMENT_DEPLOYED == 'true' }}
+        run: |
+          currentDateTime=`date`
+          echo "Starting the probe set-up: ${currentDateTime}"
+          az webapp config set -g ${{secrets.APP_SERVICE_RESOURCE_GROUP}} -n ${{secrets.APP_SERVICE_NAME}} --slot staging --generic-configurations '{"healthCheckPath": "/actuator/health/liveness"}'
+          currentDateTime=`date`
+          echo "Finnished the probe set-up: ${currentDateTime}"
+      
+      - name: Remove DB Firewall exception used for Schema sync
+        if: ${{ steps.init.outputs.ENVIRONMENT_DEPLOYED == 'true' }}
+        run: |
+          az postgres flexible-server firewall-rule delete --rule-name "AllowDeploymentClientIP" -g ${{secrets.PGSQL_RESOURCE_GROUP}} --name ${{secrets.PGSQL_NAME}} --yes
+      
+      - name: Run INTEGRATION tests on the staging slot
+        if: ${{ steps.init.outputs.ENVIRONMENT_DEPLOYED == 'true' }}
+        run: |
+          echo "Running integration tests on the staging slot..."
