@@ -18,7 +18,7 @@ jobs:
         with:
           java-version: "11"
       - name: Install dependencies
-        run: mvn -B -q dependency:resolve
+        run: cd scripts/dast && docker compose up -d
     #   - name: Run OWASP Dependency Check
     #     uses: dependency-check/action@v2
     #     with:
