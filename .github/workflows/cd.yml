@@ -1,5 +1,6 @@
 name: cd
 
+#todo: would be great to modify all the bash shell script and this deployment action to accept --
 on:
   release:
     types: [released]
@@ -194,7 +195,7 @@ jobs:
       - name: Remove DB Firewall exception used for Schema sync
         if: ${{ steps.init.outputs.ENVIRONMENT_DEPLOYED == 'true' }}
         run: |
-          az postgres flexible-server firewall-rule delete --rule-name "AllowDeploymentClientIP" -g ${{secrets.PGSQL_RESOURCE_GROUP}} --name ${{secrets.PGSQL_NAME}} --yes
+          az postgres flexible-server firewall-rule delete --rule-name "AllowDeploymentClientIP" -g ${{secrets.PGSQL_RESOURCE_GROUP}} --name ${{secrets.PGSQL_NAME}} --subscription "${{secrets.PGSQL_SUBSCRIPTION_ID}}" --yes
       
       - name: Run INTEGRATION tests on the staging slot
         if: ${{ steps.init.outputs.ENVIRONMENT_DEPLOYED == 'true' }}
