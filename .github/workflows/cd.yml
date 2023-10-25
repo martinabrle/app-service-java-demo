@@ -12,7 +12,7 @@ on:
 jobs:
   init:
     runs-on: ubuntu-latest
-    if: ${{ startsWith(github.ref, 'refs/tags/v') }} 
+    if: ${{ startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && startsWith(inputs.version,'v')) }} 
     outputs:
       RELEASE_VERSION: ${{ steps.init.outputs.RELEASE_VERSION }}
       RELEASE_VERSION_NUMBER: ${{ steps.init.outputs.RELEASE_VERSION_NUMBER }}
