@@ -19,6 +19,7 @@ jobs:
           java-version: "11"
       - name: Install dependencies
         run: cd todo && ./mvnw clean package -DskipTests
+      - uses: snyk/actions/setup@master
     #   - name: Run OWASP Dependency Check
     #     uses: dependency-check/action@v2
     #     with:
@@ -31,12 +32,10 @@ jobs:
     #       name: Dependency Check Report
     #       path: dependency-check-report.html
       - name: Run Snyk Security Scan
-        uses: snyk/actions/maven-3-jdk-11@master
+        run: cd todo && snyk test --sarif-file-output=snyk.sarif
         env:
             SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         continue-on-error: true
-        with:
-            args: ./todo --sarif-file-output=snyk.sarif
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v2
         with:
