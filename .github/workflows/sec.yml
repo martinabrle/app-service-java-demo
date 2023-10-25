@@ -7,6 +7,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   sast:
     permissions:
@@ -24,7 +27,8 @@ jobs:
       - name: Install dependencies
         run: cd todo && ./mvnw clean package -DskipTests
       - uses: snyk/actions/setup@master
-    #   - name: Run OWASP Dependency Check
+        env:
+            SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}    #   - name: Run OWASP Dependency Check
     #     uses: dependency-check/action@v2
     #     with:
     #       format: "ALL"
@@ -36,16 +40,16 @@ jobs:
     #       name: Dependency Check Report
     #       path: dependency-check-report.html
       - name: Snyk Code test
-        run: cd todo && snyk code test --sarif > snyk-code.sarif # || true
+        run: snyk code test --sarif > snyk-code.sarif || true
         env:
             SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         continue-on-error: true
         # Runs Snyk Open Source (SCA) analysis and uploads result to Snyk.
       - name: Snyk Open Source monitor
-        run: cd todo && snyk monitor --all-projects
+        run: snyk monitor --all-projects
         env:
             SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-            continue-on-error: true
+        continue-on-error: true
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v2
         with:
@@ -90,7 +94,7 @@ jobs:
       - name: Create sarif file from zaproxy results
         uses: SvanBoxel/zaproxy-to-ghas@main
       - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v1
+        uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: results.sarif
 
