@@ -2,8 +2,8 @@ name: cd
 
 #todo: would be great to modify all the bash shell script and this deployment action to accept --
 on:
-  release:
-    types: [released]
+  # release: - causes problem with az login with a federated identity
+  #   types: [released]
   workflow_dispatch:
     inputs:
       version:
