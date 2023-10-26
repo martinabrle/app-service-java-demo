@@ -3,9 +3,9 @@
 
 ![Architecture Diagram](../../diagrams/tiny-java-app-service-managed-identities.png)
 
-* Start the command line, clone the repo using ```git clone https://github.com/martinabrle/tiny-java.git``` and change your current directory to ```tiny-java/scripts``` directory:
+* Start the command line, clone the repo using ```git clone https://github.com/martinabrle/app-service-java-demo.git``` and change your current directory to ```app-service-java-demo/scripts``` directory:
     ```
-    cd ./tiny-java/scripts
+    cd ./app-service-java-demo/scripts
     ```
 * Log in into Azure from the command line using ```az login``` ([link](https://docs.microsoft.com/en-us/cli/azure/authenticate-azure-cli))
 * List available Azure subscriptions using ```az account list -o table``` ([link](https://docs.microsoft.com/en-us/cli/azure/account#az-account-list))
@@ -110,7 +110,7 @@
                                -o "${DB_APP_USER_STAGING_APP_ID}"
     ```
 
-* Change your current directory to ```tiny-java/todo```:
+* Change your current directory to ```app-service-java-demo/todo```:
     ```
     cd ../todo
     ```
