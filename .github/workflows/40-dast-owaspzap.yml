@@ -1,4 +1,4 @@
-name: DAST-OWASPZap
+name: 40-DAST-OWASPZap
 on:
   schedule:
     - cron: '45 13 * * 1'

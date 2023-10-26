@@ -4,7 +4,7 @@
 # You may wish to alter this file to override the set of languages analyzed,
 # or to provide custom queries or build logic.
 
-name: SAST-Semgrep
+name: 31-SAST-Semgrep
 
 on:
   # to make sure new SAST rules are applied also to production code -> make sure the default branch is "current Prod-Release".

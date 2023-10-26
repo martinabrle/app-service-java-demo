@@ -1,4 +1,4 @@
-name: SAST-Snyk
+name: 33-SAST-Snyk
 on:
   schedule:
     - cron: '45 13 * * 1'
