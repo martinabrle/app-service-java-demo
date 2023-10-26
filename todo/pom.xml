@@ -17,7 +17,7 @@
   <description>Demo project for Spring Boot (API + FRONTEND)</description>
   <properties>
     <java.version>11</java.version>
-    <version.spring.cloud.azure>4.12.0</version.spring.cloud.azure>
+    <version.spring.cloud.azure>5.6.0</version.spring.cloud.azure>
     <spring-cloud.version>2021.0.8</spring-cloud.version>
   </properties>
   <dependencies>
