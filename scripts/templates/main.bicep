@@ -18,6 +18,7 @@ param logAnalyticsRG string = resourceGroup().name
 param logAnalyticsTags string = appServiceTags
 
 param healthCheckPath string = '/'
+param stagingHealthCheckPath string = '/'
 
 @secure()
 param dbUserName string
@@ -84,7 +85,7 @@ module appServiceStagingSlot 'components/app-service-slot.bicep' = {
     appServicePlanName: appService.outputs.appServicePlanName
     appServiceTags: appServiceTags
     appServiceSlotName: 'staging'
-    healthCheckPath: healthCheckPath
+    healthCheckPath: stagingHealthCheckPath
     logAnalyticsWorkspaceId: logAnalytics.outputs.logAnalyticsWorkspaceId
     location: location
   }
