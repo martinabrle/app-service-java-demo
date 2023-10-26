@@ -43,3 +43,7 @@ jobs:
     name: OWASP ZAP
     uses: ./.github/workflows/40-dast-owaspzap.yml
     secrets: inherit
+  dependency:
+    name: Dependency review
+    uses: ./.github/workflows/50-dependency-review.yml
+    
