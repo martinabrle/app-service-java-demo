@@ -1,0 +1,45 @@
+name: 99 - Complex Workflow
+
+on:
+  push:
+    branches: [ "main" ]
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.txt'
+  pull_request:
+    # These types are all required for CRDA to scan pull requests correctly and securely.
+    types: [ opened, synchronize, reopened, labeled, edited ]
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.txt'
+  workflow_dispatch:
+
+concurrency: 
+  group:  ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  codeql:
+    name: CodeQL
+    uses: ./.github/workflows/30-sast-codeql.yml
+    secrets: inherit #https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idsecretsinherit
+  semgrep:
+    name: Semgrep
+    needs: codeql
+    uses: ./.github/workflows/31-sast-semgrep.yml
+    secrets: inherit
+  spotbugs:
+    needs: codeql
+    name: SpotBugs
+    uses: ./.github/workflows/32-sast-spotbugs.yml
+    secrets: inherit
+  snyk:
+    needs: codeql
+    name: Snyk
+    uses: ./.github/workflows/33-sast-snyk.yml
+    secrets: inherit 
+  owasp:
+    needs: codeql
+    name: OWASP ZAP
+    uses: ./.github/workflows/40-dast-owaspzap.yml
+    secrets: inherit
