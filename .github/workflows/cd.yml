@@ -1,6 +1,10 @@
 name: cd
 
-#todo: would be great to modify all the bash shell script and this deployment action to accept --
+# This workflow can be folded into the CI.yml to improve performance, however, for demo purposes, I keep it separate
+
+# todo: for performance, it would be great to modify all the bash shell script and this deployment action to accept
+#      "--subscription" parameter in order to avoid having to call az account set -s "000-000.." too often
+  
 on:
   # release: - causes problem with az login with a federated identity
   #   types: [released]
