@@ -1,7 +1,6 @@
 package app.demo.todo;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import app.demo.todo.utils.AppLogger;
@@ -14,11 +13,6 @@ public class AppConfig {
     private String loadDemoData = "false";
     private String debugAuthToken = "false";
     private String environment = "Unknown";
-
-    // @Bean
-    // public AppConfig appConfig() {
-    //     return new AppConfig();
-    // }
 
     public void setLoadDemoData(String loadDemoData) {
         this.loadDemoData = loadDemoData;
