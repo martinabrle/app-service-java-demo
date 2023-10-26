@@ -4,8 +4,7 @@
 # You may wish to alter this file to override the set of languages analyzed,
 # or to provide custom queries or build logic.
 
-name: 30 SAST
-
+name: CodeQL
 on:
   # to make sure new SAST rules are applied also to production code -> make sure the default branch is "current Prod-Release".
   schedule:
@@ -18,7 +17,7 @@ permissions:
 
 jobs:
   SAST-CodeQL:
-    name: Build and SAST CodeQL
+    name: ci/codeql
     runs-on: ubuntu-latest
     permissions:
       actions: read
@@ -86,83 +85,3 @@ jobs:
         with:
           name: target
           path: ${{github.workspace}}/todo/target 
-
-  spotbugs:
-    name: SAST SpotBugs
-    needs: [SAST-CodeQL]
-    runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-    - name: Use Build cache
-      uses: actions/cache@v3
-      with:
-        path: todo/target
-        key: ${{ runner.os }}-target
-    - name: Use m2 cache
-      uses: actions/cache@v3
-      with:
-        path: ~/.m2/**/*.jar
-        key: ${{ runner.os }}-m2
-    - name: Run SpotBugs action
-      uses: jmservera/spotbugs-github-action@v0.1.0-alpha
-      with:
-        packages: app.demo.todo.*, app.demo.todo.controller.*
-        target: ./todo/target
-        dependenciesPath: ~/.m2
-        basePath: todo/src/main/java
-        arguments: -progress
-    - name: Upload SpotBugs report
-      uses: actions/upload-artifact@v3.1.3
-      with:
-        name: spotbugs.sarif
-        path: ${{github.workspace}}/results.sarif
-    - name: Upload analysis results to GitHub Security tab
-      if: always()
-      uses: github/codeql-action/upload-sarif@v2.22.4
-      with:
-        sarif_file: ${{github.workspace}}/results.sarif    
-
-  semgrep:
-    needs: [SAST-CodeQL]
-    # User-definable name of this GitHub Actions job:
-    name: SAST Semgrep
-    # If you are self-hosting, change the following `runs-on` value: 
-    runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
-    container:
-      # A Docker image with Semgrep installed. Do not change this.
-      image: returntocorp/semgrep
-
-    # To skip any PR created by dependabot to avoid permission issues:
-    if: (github.actor != 'dependabot[bot]')
-
-    steps:
-      # Fetch project source with GitHub Actions Checkout.
-      - uses: actions/checkout@v3
-      - run: semgrep ci -o results.sarif --sarif
-        env:
-           # Add the rules that Semgrep uses by setting the SEMGREP_RULES environment variable. 
-           SEMGREP_RULES: p/default p/security-audit # more at semgrep.dev/explore
-           # Uncomment SEMGREP_TIMEOUT to set this job's timeout (in seconds):
-           # Default timeout is 1800 seconds (30 minutes).
-           # Set to 0 to disable the timeout.
-           # SEMGREP_TIMEOUT: 300
-      - name: Upload Semgrep Report
-        uses: actions/upload-artifact@v3.1.3
-        if: always()
-        with:
-          name: semgrep.sarif
-          path: ${{github.workspace}}/results.sarif
-      - name: Upload analysis results to GitHub Security tab
-        if: always()
-        uses: github/codeql-action/upload-sarif@v2.22.4
-        with:
-          sarif_file: ${{github.workspace}}/results.sarif

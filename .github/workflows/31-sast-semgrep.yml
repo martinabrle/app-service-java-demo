@@ -1,0 +1,57 @@
+# For most projects, this workflow file will not need changing; you simply need
+# to commit it to your repository.
+#
+# You may wish to alter this file to override the set of languages analyzed,
+# or to provide custom queries or build logic.
+
+name: Semgrep
+
+on:
+  # to make sure new SAST rules are applied also to production code -> make sure the default branch is "current Prod-Release".
+  schedule:
+    - cron: '35 14 * * 1'
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+    contents: read
+
+jobs:
+  semgrep:
+    # User-definable name of this GitHub Actions job:
+    name: ci/semgrep
+    # If you are self-hosting, change the following `runs-on` value: 
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    container:
+      # A Docker image with Semgrep installed. Do not change this.
+      image: returntocorp/semgrep
+
+    # To skip any PR created by dependabot to avoid permission issues:
+    if: (github.actor != 'dependabot[bot]')
+
+    steps:
+      # Fetch project source with GitHub Actions Checkout.
+      - uses: actions/checkout@v3
+      - run: semgrep ci -o results.sarif --sarif
+        env:
+           # Add the rules that Semgrep uses by setting the SEMGREP_RULES environment variable. 
+           SEMGREP_RULES: p/default p/security-audit # more at semgrep.dev/explore
+           # Uncomment SEMGREP_TIMEOUT to set this job's timeout (in seconds):
+           # Default timeout is 1800 seconds (30 minutes).
+           # Set to 0 to disable the timeout.
+           # SEMGREP_TIMEOUT: 300
+      - name: Upload Semgrep Report
+        uses: actions/upload-artifact@v3.1.3
+        if: always()
+        with:
+          name: semgrep.sarif
+          path: ${{github.workspace}}/results.sarif
+      - name: Upload analysis results to GitHub Security tab
+        if: always()
+        uses: github/codeql-action/upload-sarif@v2.22.4
+        with:
+          sarif_file: ${{github.workspace}}/results.sarif
