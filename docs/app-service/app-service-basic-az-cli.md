@@ -3,9 +3,9 @@
 
 ![Architecture Diagram](../../diagrams/tiny-java-app-service-basic.png)
 
-* Start the command line, clone the repo using ```git clone https://github.com/martinabrle/tiny-java.git``` and change your current directory to ```tiny-java/scripts``` directory:
+* Start the command line, clone the repo using ```git clone https://github.com/martinabrle/app-service-java-demo.git``` and change your current directory to ```app-service-java-demo/scripts``` directory:
     ```
-    cd ./tiny-java/scripts
+    cd ./app-service-java-demo/scripts
     ```
 
 * Log in into Azure from the command line using ```az login``` ([link](https://docs.microsoft.com/en-us/cli/azure/authenticate-azure-cli))
@@ -75,7 +75,7 @@
     GRANT INSERT ON todo TO ${AZURE_DB_APP_USER_NAME};
     ```
 
-* Change your current directory to ```tiny-java/todo```:
+* Change your current directory to ```app-service-java-demo/todo```:
     ```
     cd ../todo
     ```
@@ -91,6 +91,7 @@
   az webapp config appsettings set -g $AZURE_RESOURCE_GROUP -n $AZURE_APP_NAME --settings SPRING_DATASOURCE_URL="jdbc:postgresql://${AZURE_DB_SERVER_NAME}.postgres.database.azure.com:5432/${AZURE_DB_NAME}"
   az webapp config appsettings set -g $AZURE_RESOURCE_GROUP -n $AZURE_APP_NAME --settings SPRING_DATASOURCE_USERNAME=$AZURE_DB_APP_USER_NAME
   az webapp config appsettings set -g $AZURE_RESOURCE_GROUP -n $AZURE_APP_NAME --settings SPRING_DATASOURCE_PASSWORD=$AZURE_DB_APP_USER_PASSWORD
+  az webapp config appsettings set -g $AZURE_RESOURCE_GROUP -n $AZURE_APP_NAME --settings SPRING_PROFILES_ACTIVE=azure-classic
   az webapp config appsettings set -g $AZURE_RESOURCE_GROUP -n $AZURE_APP_NAME --settings SPRING_DATASOURCE_SHOW_SQL=true
   ```
 

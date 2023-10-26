@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    jdbc-url: ${SPRING_DATASOURCE_URL}?sslmode=verify-full&sslrootcert=DigiCertGlobalRootCA.crt.pem
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: ${SPRING_DATASOURCE_SHOW_SQL}
+    hibernate:
+      ddl-auto: validate
+
+app.demo.todo.debug-auth-token: ${DEBUG_AUTH_TOKEN}
+
+azure.application-insights.instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY}
+azure.application-insights.connection-string:  ${APPLICATIONINSIGHTS_CONNECTION_STRING}
