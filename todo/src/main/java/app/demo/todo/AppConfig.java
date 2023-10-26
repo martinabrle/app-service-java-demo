@@ -23,6 +23,7 @@ public class AppConfig {
     }
 
     public void setEnvironment(String environment) {
+        LOGGER.error(String.format("Environment set: '%s'", environment));
         this.environment = environment;
     }
 
