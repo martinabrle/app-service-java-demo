@@ -15,10 +15,10 @@ public class AppConfig {
     private String debugAuthToken = "false";
     private String environment = "Unknown";
 
-    @Bean
-    public AppConfig appConfig() {
-        return new AppConfig();
-    }
+    // @Bean
+    // public AppConfig appConfig() {
+    //     return new AppConfig();
+    // }
 
     public void setLoadDemoData(String loadDemoData) {
         this.loadDemoData = loadDemoData;
