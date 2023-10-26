@@ -100,11 +100,10 @@ jobs:
     - name: Run SpotBugs action
       uses: jmservera/spotbugs-github-action@v0.1.0-alpha
       with:
-        packages: app.demo.todo.-
+        packages: app.demo.todo.*, app.demo.todo.controller.*
         target: ./todo/target
         dependenciesPath: ~/.m2
         basePath: todo/src/main/java
-        spotbugs-version: 4.7.3
         arguments: -progress
     - name: Upload SpotBugs report
       uses: actions/upload-artifact@v3.1.3
