@@ -6,6 +6,17 @@
 
 name: 30-SAST-CodeQL
 on:
+  push:
+    branches: [ "main" ]
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.txt'
+  pull_request:
+    # These types are all required for CRDA to scan pull requests correctly and securely.
+    types: [ opened, synchronize, reopened, labeled, edited ]
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.txt'
   # to make sure new SAST rules are applied also to production code -> make sure the default branch is "current Prod-Release".
   schedule:
     - cron: '35 12 * * 1'
