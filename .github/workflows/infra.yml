@@ -94,7 +94,7 @@ jobs:
             --template-file ./templates/main.bicep \
             --parameters appServiceName="${{secrets.APP_SERVICE_NAME}}" \
                          appServicePort=${{secrets.APP_SERVICE_PORT}} \
-                         appServiceTags=""${{vars.APP_SERVICE_RESOURCE_TAGS}}" \
+                         appServiceTags="${{vars.APP_SERVICE_RESOURCE_TAGS}}" \
                          pgsqlName="${{secrets.PGSQL_NAME}}" \
                          pgsqlAADAdminGroupName="${{secrets.DBA_GROUP_NAME}}" \
                          pgsqlAADAdminGroupObjectId="${{steps.vars.outputs.DBA_GROUP_ID}}" \
