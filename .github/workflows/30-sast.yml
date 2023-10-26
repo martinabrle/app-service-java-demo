@@ -16,13 +16,9 @@ on:
 permissions:
     contents: read
 
-env:
-  runson: ubuntu-latest
-  steps:
-
 jobs:
   prepare:
-    runs-on: ${{ env.runson }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -55,7 +51,7 @@ jobs:
 
   SAST-CodeQL:
     name: Build and SAST CodeQL
-    runs-on: ${{ env.runson }}
+    runs-on: ubuntu-latest
     needs: [prepare]
     permissions:
       actions: read
