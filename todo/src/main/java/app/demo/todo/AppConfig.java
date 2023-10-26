@@ -1,11 +1,11 @@
 package app.demo.todo;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import app.demo.todo.utils.AppLogger;
 
-@Configuration
+@Component
 @ConfigurationProperties(prefix = "app.demo.todo")
 public class AppConfig {
     public static final AppLogger LOGGER = new AppLogger(AppConfig.class);

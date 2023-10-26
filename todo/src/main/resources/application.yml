@@ -7,8 +7,6 @@ server:
   port: ${PORT}
   shutdown: graceful
 
-app.demo.todo.environment: ${ENVIRONMENT}
-
 # Spring Boot 1.5 makes actuator secure by default
 management.security.enabled: false
 # Enable all Actuators and not only the two available by default /health and /info starting Spring Boot 2.0
@@ -20,6 +18,7 @@ spring.cloud.refresh.refreshable: false
 
 # App settings
 app.demo.todo.load-demo-data: ${LOAD_DEMO_DATA}
+app.demo.todo.environment: ${ENVIRONMENT}
 
 # Logging
 logging.level: warn
