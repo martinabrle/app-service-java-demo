@@ -1,0 +1,151 @@
+name: infra-app-service-mi
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy_infra:
+    runs-on: ubuntu-latest
+    permissions:
+        id-token: write
+        contents: read
+    defaults:
+      run:
+        working-directory: ./scripts
+    steps:
+      - name: Azure login # https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AAD_CLIENT_ID }}
+          tenant-id: ${{ secrets.AAD_TENANT_ID }}
+          subscription-id: ${{ secrets.APP_SERVICE_SUBSCRIPTION_ID }}
+
+      - name: Create Azure resource group
+        run: |
+            az deployment sub create \
+              -l $AZURE_LOCATION \
+              --template-file ./templates/resource_groups.bicep \
+              --parameters location="${{secrets.AZURE_LOCATION}}" \
+                           appServiceRG="${{secrets.APP_SERVICE_RESOURCE_GROUP}}" \
+                           appServiceTags="${{vars.APP_SERVICE_RESOURCE_TAGS}}" \
+                           pgsqlSubscriptionId="${{secrets.PGSQL_SUBSCRIPTION_ID}}" \
+                           pgsqlRG="${{secrets.PGSQL_RESOURCE_GROUP}}" \
+                           pgsqlTags="${{vars.PGSQL_RESOURCE_TAGS}}" \
+                           logAnalyticsSubscriptionId="${{secrets.LOG_ANALYTICS_WRKSPC_SUBSCRIPTION_ID}}" \
+                           logAnalyticsRG="${{secrets.LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP}}" \
+                           logAnalyticsTags="${{vars.LOG_ANALYTICS_WRKSPC_RESOURCE_TAGS}}"
+        
+      - name: Initialize deployment variables
+        id: vars
+        run: |
+          clientIP=`dig +short myip.opendns.com @resolver1.opendns.com.`
+          echo "DEPLOYMENT_CLIENT_IP=${clientIP}" >> $GITHUB_OUTPUT
+          echo "Client IP: $clientIP"
+          
+          dbAppUserName=`echo "${{secrets.APP_SERVICE_NAME}}" | tr '-' '_'`;
+          echo "DB_APP_USER_NAME=${dbAppUserName}" >> $GITHUB_OUTPUT
+          echo "App user name: $dbAppUserName"
+
+          dbStagingAppUserName=`echo "${{secrets.APP_SERVICE_NAME}}-staging" | tr '-' '_'`;
+          echo "DB_STAGING_APP_USER_NAME=${dbStagingAppUserName}" >> $GITHUB_OUTPUT
+          echo "Staging app user name: $dbStagingAppUserName"
+
+          if [[ -z "${{secrets.DBA_GROUP_NAME}}" ]]; then
+            echo "DBA Group name is not set"
+            exit 1
+          fi
+
+          dbaGroupId=`az ad group show --group "${{secrets.DBA_GROUP_NAME}}" --query '[id]' -o tsv`
+          echo "DBA Group Name: '${{secrets.DBA_GROUP_NAME}}'"
+          echo "DBA Group Id: $dbaGroupId"
+          echo "DBA_GROUP_ID=${dbaGroupId}" >> $GITHUB_OUTPUT
+
+          export appName=`az webapp list -g ${{secrets.APP_SERVICE_RESOURCE_GROUP}} --query "[?name=='${{secrets.APP_SERVICE_NAME}}'].name" -o tsv`
+          if [[ -z "$appName" ]]; then
+            echo "First deployment"
+            echo "HEALTH_CHECK_PATH=" >> $GITHUB_OUTPUT
+            echo "STAGING_HEALTH_CHECK_PATH=" >> $GITHUB_OUTPUT
+          else
+            healthCheckPath=`az webapp show -g ${{secrets.APP_SERVICE_RESOURCE_GROUP}} -n "${{secrets.APP_SERVICE_NAME}}" --query "siteConfig.healthCheckPath" -o tsv`
+            echo "HEALTH_CHECK_PATH=${healthCheckPath}" >> $GITHUB_OUTPUT
+            stagingHealthCheckPath=`az webapp show -g ${{secrets.APP_SERVICE_RESOURCE_GROUP}} -n "${{secrets.APP_SERVICE_NAME}}" --query "siteConfig.healthCheckPath" -o tsv`
+            echo "STAGING_HEALTH_CHECK_PATH=${stagingHealthCheckPath}" >> $GITHUB_OUTPUT
+          fi
+        
+      - name: Deploy Azure resources
+        id: deployment
+        run: |
+          echo "Deploying with the following parameters:"
+          echo "App service name: '${{secrets.APP_SERVICE_NAME}}'"
+          echo "App port: '${{secrets.APP_SERVICE_PORT}}'"
+          echo "DBA Group Name: '${{secrets.DBA_GROUP_NAME}}'"
+          echo "DBA Group Id: '${{steps.vars.outputs.DBA_GROUP_ID}}'"
+          echo "User name: '${{steps.vars.outputs.DB_APP_USER_NAME}}'"
+          echo "Staging user name: '${{steps.vars.outputs.DB_STAGING_APP_USER_NAME}}'"
+          echo "Health check API Path: '${{steps.vars.outputs.HEALTH_CHECK_PATH}}'"
+          echo "Staging health check API Path: '${{steps.vars.outputs.STAGING_HEALTH_CHECK_PATH}}'"
+          echo "Deployment client IP Address: '${{steps.vars.outputs.DEPLOYMENT_CLIENT_IP}}'"
+          
+          az deployment group create \
+            --resource-group $APP_SERVICE_RESOURCE_GROUP \
+            --template-file ./templates/main.bicep \
+            --parameters appServiceName="${{secrets.APP_SERVICE_NAME}}" \
+                         appServicePort=${{secrets.APP_SERVICE_PORT}} \
+                         appServiceTags=""${{vars.APP_SERVICE_RESOURCE_TAGS}}" \
+                         pgsqlName="${{secrets.PGSQL_NAME}}" \
+                         pgsqlAADAdminGroupName="${{secrets.DBA_GROUP_NAME}}" \
+                         pgsqlAADAdminGroupObjectId="${{steps.vars.outputs.DBA_GROUP_ID}}" \
+                         pgsqlDbName="${{secrets.DB_NAME}}" \
+                         pgsqlStagingDbName="${{secrets.DB_NAME_STAGING}}" \
+                         pgsqlSubscriptionId="${{secrets.PGSQL_SUBSCRIPTION_ID}}" \
+                         pgsqlRG="${{secrets.PGSQL_RESOURCE_GROUP}}" \
+                         pgsqlTags=${{vars.PGSQL_RESOURCE_TAGS}}" \
+                         logAnalyticsName="${{secrets.LOG_ANALYTICS_WRKSPC_NAME}}" \
+                         logAnalyticsSubscriptionId="${{secrets.LOG_ANALYTICS_WRKSPC_SUBSCRIPTION_ID}}" \
+                         logAnalyticsRG="${{secrets.LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP}}" \
+                         logAnalyticsTags="${{vars.LOG_ANALYTICS_WRKSPC_RESOURCE_TAGS}}" \
+                         healthCheckPath="${{steps.vars.outputs.HEALTH_CHECK_PATH}}" \
+                         stagingHealthCheckPath="${{steps.vars.outputs.STAGING_HEALTH_CHECK_PATH}}" \
+                         dbUserName="${{steps.vars.outputs.DB_APP_USER_NAME}}" \
+                         dbStagingUserName="${{steps.vars.outputs.DB_STAGING_APP_USER_NAME}}" \
+                         deploymentClientIPAddress="${{steps.vars.outputs.DEPLOYMENT_CLIENT_IP}}" \
+                         location="${{secrets.AZURE_LOCATION}}"
+
+      - name: Create Database
+        run: |
+          # When the database gets created using a script, AAD accounts gets full permissions on public schema and can assign roles
+          export PGPASSWORD=`az account get-access-token --resource-type oss-rdbms --query "[accessToken]" --output tsv`
+          ./create_aad_db.sh -s "${{secrets.PGSQL_NAME}}" -d "${{secrets.DB_NAME}}" -a "${{secrets.DBA_GROUP_NAME}}"
+          ./create_aad_db.sh -s "${{secrets.PGSQL_NAME}}" -d "${{secrets.DB_NAME_STAGING}}" -a "${{secrets.DBA_GROUP_NAME}}"
+      
+      - name: Init AAD ClientIds
+        id: aad_vars
+        run: |
+          appClientId=`az ad sp list --display-name "${{secrets.APP_SERVICE_NAME}}" --query "[?displayName=='${{secrets.APP_SERVICE_NAME}}'].appId" --out tsv`
+          echo "APP_CLIENT_ID=${appClientId}" >> $GITHUB_OUTPUT
+          stagingAppClientId=`az ad sp list --display-name "${{secrets.APP_SERVICE_NAME}}/slots/staging" --query "[?displayName=='${{secrets.APP_SERVICE_NAME}}/slots/staging'].appId" --out tsv`
+          echo "STAGING_APP_CLIENT_ID=${stagingAppClientId}" >> $GITHUB_OUTPUT
+      
+      - name: Create AppService default slot DB user
+        run: |
+          export PGPASSWORD=`az account get-access-token --resource-type oss-rdbms --query "[accessToken]" --output tsv`
+          ./create_aad_pgsql_user.sh \
+            -s "${{secrets.PGSQL_NAME}}" \
+            -d "${{secrets.DB_NAME}}" \
+            -a "${{secrets.DBA_GROUP_NAME}}" \
+            -n "${{steps.vars.outputs.DB_APP_USER_NAME}}" \
+            -o "${{steps.aad_vars.outputs.APP_CLIENT_ID}}"
+
+      - name: Create AppService staging slot DB user
+        run: |
+          export PGPASSWORD=`az account get-access-token --resource-type oss-rdbms --query "[accessToken]" --output tsv`
+          ./create_aad_pgsql_user.sh \
+            -s "${{secrets.PGSQL_NAME}}" \
+            -d "${{secrets.DB_NAME_STAGING}}" \
+            -a "${{secrets.DBA_GROUP_NAME}}" \
+            -n "${{steps.vars.outputs.DB_STAGING_APP_USER_NAME}}" \
+            -o "${{steps.aad_vars.outputs.STAGING_APP_CLIENT_ID}}"
+
+      - name: Remove DB Firewall exception used for DB setup
+        run: |
+          az postgres flexible-server firewall-rule delete --rule-name "AllowDeploymentClientIP" --resource-group "${{secrets.PGSQL_RESOURCE_GROUP}}" --name "${{secrets.PGSQL_NAME}}" --yes
