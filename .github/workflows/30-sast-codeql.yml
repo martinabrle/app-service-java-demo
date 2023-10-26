@@ -4,7 +4,7 @@
 # You may wish to alter this file to override the set of languages analyzed,
 # or to provide custom queries or build logic.
 
-name: CodeQL
+name: SAST-CodeQL
 on:
   # to make sure new SAST rules are applied also to production code -> make sure the default branch is "current Prod-Release".
   schedule:
@@ -16,7 +16,7 @@ permissions:
     contents: read
 
 jobs:
-  SAST-CodeQL:
+  CodeQL:
     name: ci/codeql
     runs-on: ubuntu-latest
     permissions:

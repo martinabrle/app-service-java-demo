@@ -1,9 +1,5 @@
-name: Snyk
+name: SAST-Snyk
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
   schedule:
     - cron: '45 13 * * 1'
   workflow_call:

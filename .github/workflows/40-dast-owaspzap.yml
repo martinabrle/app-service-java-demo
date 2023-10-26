@@ -1,9 +1,5 @@
-name: DevSecOps Security Scan
+name: DAST-OWASPZap
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
   schedule:
     - cron: '45 13 * * 1'
   workflow_call:
