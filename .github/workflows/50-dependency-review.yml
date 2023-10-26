@@ -13,5 +13,7 @@ jobs:
     steps:
       - name: 'Checkout Repository'
         uses: actions/checkout@v4
-      - name: 'Dependency Review'
+      - run: echo "${{ github.event_name }}"
+      - name: 'Dependency Review from PR'
+        if: github.event_name == 'pull_request'
         uses: actions/dependency-review-action@v3
