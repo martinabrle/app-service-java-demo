@@ -70,14 +70,14 @@ jobs:
           path: ~/.m2/**/*.jar
           key: ${{ runner.os }}-m2
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@main
         with:
           name: target
           path: ${{github.workspace}}/todo/target      
 
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@main
         with:
           category: "/language:${{matrix.language}}"
 
@@ -100,13 +100,13 @@ jobs:
         dependenciesPath: ~/.m2
         basePath: src/main/java
     - name: Upload SpotBugs report
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@main
       with:
         name: spotbugs.sarif
         path: ${{github.workspace}}/results.sarif
     - name: Upload analysis results to GitHub Security tab
       if: always()
-      uses: github/codeql-action/upload-sarif@v2.1.28
+      uses: github/codeql-action/upload-sarif@main
       with:
         sarif_file: ${{github.workspace}}/results.sarif    
 
@@ -139,13 +139,13 @@ jobs:
            # Set to 0 to disable the timeout.
            # SEMGREP_TIMEOUT: 300
       - name: Upload Semgrep Report
-        uses: actions/upload-artifact@v3.1.0
+        uses: actions/upload-artifact@main
         if: always()
         with:
           name: semgrep.sarif
           path: ${{github.workspace}}/results.sarif
       - name: Upload analysis results to GitHub Security tab
         if: always()
-        uses: github/codeql-action/upload-sarif@v2.1.28
+        uses: github/codeql-action/upload-sarif@main
         with:
           sarif_file: ${{github.workspace}}/results.sarif
