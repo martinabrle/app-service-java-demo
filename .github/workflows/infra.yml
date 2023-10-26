@@ -151,4 +151,5 @@ jobs:
 
       - name: Remove DB Firewall exception used for DB setup
         run: |
-          az postgres flexible-server firewall-rule delete --rule-name "AllowDeploymentClientIP" --resource-group "${{secrets.PGSQL_RESOURCE_GROUP}}" --name "${{secrets.PGSQL_NAME}}" --yes
+          az postgres flexible-server firewall-rule delete --rule-name "AllowDeploymentClientIP" -g ${{secrets.PGSQL_RESOURCE_GROUP}} --name ${{secrets.PGSQL_NAME}} --subscription "${{secrets.PGSQL_SUBSCRIPTION_ID}}" --yes
+      
