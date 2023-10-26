@@ -13,12 +13,7 @@ jobs:
     steps:
       - name: 'Checkout Repository'
         uses: actions/checkout@v4
-
-      - name: 'Dependency Review from base'
-        if: github.event_name != 'pull_request'
-        with:
-            base-ref: https://github.com/jmservera/app-service-java-demo/commit/6300e436ea3086b2f9111903ded2178732dc23d1
-        uses: actions/dependency-review-action@v3
+      - run: echo "${{ github.event_name }}"
       - name: 'Dependency Review from PR'
         if: github.event_name == 'pull_request'
         uses: actions/dependency-review-action@v3
