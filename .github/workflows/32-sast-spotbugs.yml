@@ -7,7 +7,17 @@
 name: 32-SAST-Spotbugs
 
 on:
-  # to make sure new SAST rules are applied also to production code -> make sure the default branch is "current Prod-Release".
+  push:
+    branches: [ "main" ]
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.txt'
+  pull_request:
+    # These types are all required for CRDA to scan pull requests correctly and securely.
+    types: [ opened, synchronize, reopened, labeled, edited ]
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.txt'
   schedule:
     - cron: '35 10 * * 1'
   workflow_call:
