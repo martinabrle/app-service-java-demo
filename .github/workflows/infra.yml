@@ -1,4 +1,4 @@
-name: infra-app-service-mi
+name: infra
 
 on:
   workflow_dispatch:
