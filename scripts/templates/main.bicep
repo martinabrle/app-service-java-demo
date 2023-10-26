@@ -230,6 +230,10 @@ module appServicePARMS 'components/app-service-params.bicep' = {
         value: 'azure'
       }
       {
+        name: 'ENVIRONMENT'
+        value: 'app-service'
+      }
+      {
         name: 'PORT'
         value: appServicePort
       }
@@ -278,6 +282,10 @@ module appServiceStagingPARMS 'components/app-service-slot-params.bicep' = {
       {
         name: 'SPRING_PROFILES_ACTIVE'
         value: 'azure'
+      }
+      {
+        name: 'ENVIRONMENT'
+        value: 'app-service'
       }
       {
         name: 'PORT'
