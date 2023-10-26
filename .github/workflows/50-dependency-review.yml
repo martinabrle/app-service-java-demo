@@ -1,6 +1,5 @@
-name: 'Dependency Review'
+name: 50-Dependency-Review
 on:
-  # to make sure new SAST rules are applied also to production code -> make sure the default branch is "current Prod-Release".
   schedule:
     - cron: '15 09 * * 1'
   workflow_call:
