@@ -103,7 +103,9 @@ jobs:
         packages: app.demo.todo.-
         target: ./todo/target
         dependenciesPath: ~/.m2
-        basePath: src/main/java
+        basePath: todo/src/main/java
+        spotbugs-version: 4.7.3
+        arguments: -progress
     - name: Upload SpotBugs report
       uses: actions/upload-artifact@v3.1.3
       with:
