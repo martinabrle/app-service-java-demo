@@ -58,3 +58,5 @@ buildNumber.properties
 assign_privileges.sql
 create_user.sql
 deploy.sh
+
+applicationinsights.log

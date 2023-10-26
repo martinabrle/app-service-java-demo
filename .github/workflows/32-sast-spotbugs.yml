@@ -1,0 +1,76 @@
+# For most projects, this workflow file will not need changing; you simply need
+# to commit it to your repository.
+#
+# You may wish to alter this file to override the set of languages analyzed,
+# or to provide custom queries or build logic.
+
+name: 32-SAST-Spotbugs
+
+on:
+  push:
+    branches: [ "main" ]
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.txt'
+  pull_request:
+    # These types are all required for CRDA to scan pull requests correctly and securely.
+    types: [ opened, synchronize, reopened, labeled, edited ]
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.txt'
+  schedule:
+    - cron: '35 10 * * 1'
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+    contents: read
+
+jobs:
+  spotbugs:
+    name: ci/spotbugs
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    - name: Use Build cache
+      uses: actions/cache@v3
+      with:
+        path: todo/target
+        key: ${{ runner.os }}-target
+    - name: Use m2 cache
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2/**/*.jar
+        key: ${{ runner.os }}-m2
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        cache: maven
+    - name: Build with mvnw
+      working-directory: todo
+      run: ./mvnw package -DskipTests    
+    - name: Run SpotBugs action
+      uses: jmservera/spotbugs-github-action@v0.2.0-alpha
+      with:
+        packages: app.demo.todo.*
+        target: ./todo/target
+        dependenciesPath: ~/.m2
+        basePath: todo/src/main/java
+        arguments: -progress
+    - name: Upload SpotBugs report
+      uses: actions/upload-artifact@v3.1.3
+      with:
+        name: spotbugs.sarif
+        path: ${{github.workspace}}/results.sarif
+    - name: Upload analysis results to GitHub Security tab
+      if: always()
+      uses: github/codeql-action/upload-sarif@v2.22.4
+      with:
+        sarif_file: ${{github.workspace}}/results.sarif    
