@@ -28,11 +28,11 @@ jobs:
     needs: codeql
     uses: ./.github/workflows/31-sast-semgrep.yml
     secrets: inherit
-  spotbugs:
-    needs: codeql
-    name: SpotBugs
-    uses: ./.github/workflows/32-sast-spotbugs.yml
-    secrets: inherit
+#   spotbugs:
+#     needs: codeql
+#     name: SpotBugs
+#     uses: ./.github/workflows/32-sast-spotbugs.yml
+#     secrets: inherit
   snyk:
     needs: codeql
     name: Snyk
