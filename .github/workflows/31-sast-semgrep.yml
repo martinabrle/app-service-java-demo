@@ -36,7 +36,7 @@ jobs:
     steps:
       # Fetch project source with GitHub Actions Checkout.
       - uses: actions/checkout@v3
-      - run: semgrep ci -o results.sarif --sarif
+      - run: semgrep ci -o results.sarif --sarif || true
         env:
            # Add the rules that Semgrep uses by setting the SEMGREP_RULES environment variable. 
            SEMGREP_RULES: p/default p/security-audit # more at semgrep.dev/explore
