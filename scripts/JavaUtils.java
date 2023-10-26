@@ -252,6 +252,17 @@ public class JavaUtils {
                 }
             }
         }
+        nodeList = doc.getElementsByTagName("GIT_COMMIT_ID");
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            var node = nodeList.item(i);
+
+            String parentNodeName = node.getParentNode().getNodeName();
+
+            if (parentNodeName.compareTo("GIT_COMMIT_ID") == 0) {
+                node.setTextContent(commitId);
+                updated = true;
+            }
+        }
         if (!updated) {
             System.err.println(
                     String.format("An error has occured, while updating the git commit id in file '%s'", fileName));
