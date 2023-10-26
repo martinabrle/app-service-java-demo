@@ -47,9 +47,9 @@ jobs:
       working-directory: todo
       run: ./mvnw package -DskipTests    
     - name: Run SpotBugs action
-      uses: jmservera/spotbugs-github-action@v0.1.0-alpha
+      uses: jmservera/spotbugs-github-action@v0.2.0-alpha
       with:
-        packages: app.demo.todo.*, app.demo.todo.controller.*
+        packages: app.demo.todo.*
         target: ./todo/target
         dependenciesPath: ~/.m2
         basePath: todo/src/main/java
