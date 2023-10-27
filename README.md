@@ -9,3 +9,5 @@ CI/CD Status:
 
 [![infrastructure deployment](https://github.com/martinabrle/app-service-java-demo/actions/workflows/infra.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/infra.yml)
 
+[![production deployment](https://github.com/martinabrle/app-service-java-demo/actions/workflows/cd-prod.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/cd-prod.yml)
+
