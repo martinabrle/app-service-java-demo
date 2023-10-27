@@ -1,6 +1,9 @@
 package app.demo.todo.controller;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Properties;
 
 import org.springframework.boot.actuate.info.Info.Builder;
@@ -26,6 +29,7 @@ public class GitStatusInfoContributor implements InfoContributor {
         loadProperties();
         return gitBuildTime;
     }
+
     public String getGitBuildVersion() {
         loadProperties();
         return gitBuildVersion;
@@ -35,6 +39,7 @@ public class GitStatusInfoContributor implements InfoContributor {
         loadProperties();
         return gitCommitIdAbbrev;
     }
+
     public String getGitCommitIdFull() {
         loadProperties();
         return gitCommitIdFull;
@@ -43,39 +48,42 @@ public class GitStatusInfoContributor implements InfoContributor {
     private void loadProperties() {
         if (!GitStatusInfoContributor.gitInfoLoaded) {
             try {
-                InputStream input = this.getClass().getClassLoader().getResourceAsStream("/BOOT-INF/classes/git.properties");
-                if (input == null) {
-                    input = this.getClass().getClassLoader().getResourceAsStream("//BOOT-INF/classes/git.properties");
-                }
-                if (input == null) {
-                    input = this.getClass().getClassLoader().getResourceAsStream("/BOOT-INF/git.properties");
-                }
-                if (input == null) {
-                    input = this.getClass().getClassLoader().getResourceAsStream("//BOOT-INF/git.properties");
-                }
-                if (input == null) {
-                    input = this.getClass().getClassLoader().getResourceAsStream("git.properties");
-                }
-                if (input == null) {
-                    input = this.getClass().getClassLoader().getResourceAsStream("/**/git.properties");
-                }
+                ClassLoader classLoader = this.getClass().getClassLoader();
+                InputStream input = classLoader.getResourceAsStream("git.properties");
                 if (input == null) {
                     throw new RuntimeException("Unable to find git.properties");
                 }
+
                 LOGGER.debug("Found git.properties and reading it");
+                try
+                {
+                    LOGGER.debug(readFromInputStream(input));
+                }
+                catch (Exception ex) {
+                    LOGGER.error(String.format("Reading git.properties failed: '%s'", ex.getMessage()));
+                }
+
+                LOGGER.debug("Reopening git.properties");
+                input = classLoader.getResourceAsStream("git.properties");
+                if (input == null) {
+                    throw new RuntimeException("Unable to reopen git.properties");
+                }
 
                 Properties prop = new Properties();
-
                 prop.load(input);
 
                 GitStatusInfoContributor.gitBuildTime = prop.getProperty("git.build.time");
-                LOGGER.debug(String.format("git.properties->git.build.time: '%s'", GitStatusInfoContributor.gitBuildTime));
+                LOGGER.debug(
+                        String.format("git.properties->git.build.time: '%s'", GitStatusInfoContributor.gitBuildTime));
                 GitStatusInfoContributor.gitBuildVersion = prop.getProperty("git.build.version");
-                LOGGER.debug(String.format("git.properties->git.build.version: '%s'", GitStatusInfoContributor.gitBuildVersion));
+                LOGGER.debug(String.format("git.properties->git.build.version: '%s'",
+                        GitStatusInfoContributor.gitBuildVersion));
                 GitStatusInfoContributor.gitCommitIdAbbrev = prop.getProperty("git.commit.id.abbrev");
-                LOGGER.debug(String.format("git.properties->git.commit.id.abbrev: '%s'", GitStatusInfoContributor.gitCommitIdAbbrev));
+                LOGGER.debug(String.format("git.properties->git.commit.id.abbrev: '%s'",
+                        GitStatusInfoContributor.gitCommitIdAbbrev));
                 GitStatusInfoContributor.gitCommitIdFull = prop.getProperty("git.commit.id.full");
-                LOGGER.debug(String.format("git.properties->git.commit.id.full: '%s'", GitStatusInfoContributor.gitCommitIdFull));
+                LOGGER.debug(String.format("git.properties->git.commit.id.full: '%s'",
+                        GitStatusInfoContributor.gitCommitIdFull));
                 GitStatusInfoContributor.gitInfoLoaded = true;
             } catch (Exception ex) {
                 LOGGER.error(String.format("Git Info contributor call failed: '%s'", ex.getMessage()));
@@ -99,4 +107,45 @@ public class GitStatusInfoContributor implements InfoContributor {
 
         LOGGER.debug("Git Info contributor called returned OK");
     }
+
+    private String readFromInputStream(InputStream inputStream)
+            throws IOException {
+        StringBuilder resultStringBuilder = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                resultStringBuilder.append(line).append("\n");
+            }
+            br.close();
+        }
+        return resultStringBuilder.toString();
+    }
 }
+
+
+                // InputStream input =
+                // this.getClass().getClassLoader().getResourceAsStream("/BOOT-INF/classes/git.properties");
+                // if (input == null) {
+                // input =
+                // this.getClass().getClassLoader().getResourceAsStream("//BOOT-INF/classes/git.properties");
+                // }
+                // if (input == null) {
+                // input =
+                // this.getClass().getClassLoader().getResourceAsStream("/BOOT-INF/git.properties");
+                // }
+                // if (input == null) {
+                // input =
+                // this.getClass().getClassLoader().getResourceAsStream("//BOOT-INF/git.properties");
+                // }
+                // if (input == null) {
+                // input =
+                // this.getClass().getClassLoader().getResourceAsStream("git.properties");
+                // }
+                // if (input == null) {
+                // input =
+                // this.getClass().getClassLoader().getResourceAsStream("/**/git.properties");
+                // }
+                // if (input == null) {
+                //     throw new RuntimeException("Unable to find git.properties");
+                // }
+                // LOGGER.debug("Found git.properties and reading it");
