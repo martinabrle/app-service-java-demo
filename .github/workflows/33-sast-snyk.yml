@@ -62,7 +62,7 @@ jobs:
     #       name: Dependency Check Report
     #       path: dependency-check-report.html
       - name: Snyk Code test
-        run: snyk code test --sarif > snyk-code.sarif || true
+        run: echo ${SNYK_TOKEN:0:4} && snyk code test --sarif > snyk-code.sarif || true
         env:
             SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         continue-on-error: true
