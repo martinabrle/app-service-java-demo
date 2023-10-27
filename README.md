@@ -3,11 +3,23 @@
 
 CI/CD Status:
 
-[![continuous integration](https://github.com/martinabrle/app-service-java-demo/actions/workflows/10-CI.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/10-CI.yml)
+[![30-SAST-CodeQL](https://github.com/martinabrle/app-service-java-demo/actions/workflows/30-sast-codeql.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/30-sast-codeql.yml)
 
-[![continuous deployment](https://github.com/martinabrle/app-service-java-demo/actions/workflows/70-CD.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/70-CD.yml)
+[![30-SAST-CodeQL](https://github.com/martinabrle/app-service-java-demo/actions/workflows/30-sast-codeql.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/30-sast-codeql.yml)
 
-[![infrastructure deployment](https://github.com/martinabrle/app-service-java-demo/actions/workflows/infra.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/99-INFRA.yml)
+[![32-SAST-Spotbugs](https://github.com/martinabrle/app-service-java-demo/actions/workflows/32-sast-spotbugs.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/32-sast-spotbugs.yml)
 
-[![production deployment](https://github.com/martinabrle/app-service-java-demo/actions/workflows/98-infra/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/70-CD-PRODUCTION.yml)
+[![32-SAST-Spotbugs](https://github.com/martinabrle/app-service-java-demo/actions/workflows/32-sast-spotbugs.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/32-sast-spotbugs.yml)
+
+[![40-DAST-OWASPZap](https://github.com/martinabrle/app-service-java-demo/actions/workflows/40-dast-owaspzap.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/40-dast-owaspzap.yml)
+
+[![50-Dependency-Review](https://github.com/martinabrle/app-service-java-demo/actions/workflows/50-dependency-review.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/50-dependency-review.yml)
+
+[![70-Continuous-Integration](https://github.com/martinabrle/app-service-java-demo/actions/workflows/70-continuous-integration.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/70-continuous-integration.yml)
+
+[![80-Continuous-Delivery](https://github.com/martinabrle/app-service-java-demo/actions/workflows/80-continuous-delivery.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/80-continuous-delivery.yml)
+
+[![85-Continuous-Delivery-Production](https://github.com/martinabrle/app-service-java-demo/actions/workflows/85-continuous-delivery-production.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/85-continuous-delivery-production.yml)
+
+[![98-Infra](https://github.com/martinabrle/app-service-java-demo/actions/workflows/98-infra.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/98-infra.yml)
 
