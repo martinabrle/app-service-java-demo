@@ -3,6 +3,10 @@
 
 CI/CD Status:
 
+[![01-Validation](https://github.com/martinabrle/app-service-java-demo/actions/workflows/01-validation-app.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/01-validation-app.yml)
+
+[![02-Validation-Infra](https://github.com/martinabrle/app-service-java-demo/actions/workflows/02-validation-infra.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/02-validation-infra.yml)
+
 [![30-SAST-CodeQL](https://github.com/martinabrle/app-service-java-demo/actions/workflows/30-sast-codeql.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/30-sast-codeql.yml)
 
 [![30-SAST-CodeQL](https://github.com/martinabrle/app-service-java-demo/actions/workflows/30-sast-codeql.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/30-sast-codeql.yml)
