@@ -47,7 +47,7 @@ jobs:
             path: ~/.m2/**/*.jar
             key: ${{ runner.os }}-m2
       - name: Install dependencies
-        run: cd todo && ./mvnw clean package -DskipTests
+        run: cd todo && ./mvnw package -DskipTests
       - uses: snyk/actions/setup@master
         env:
             SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}    #   - name: Run OWASP Dependency Check
