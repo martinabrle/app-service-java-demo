@@ -20,10 +20,13 @@ jobs:
   #         echo "inputs.version: ${{inputs.version}} "
 
   init:
+    defaults:
+      run:
+        working-directory: ./scripts
     runs-on: ubuntu-latest
     steps:
         - uses: actions/checkout@v4
     
         - name: Run basic scripts and templates validations
           run: |
-            az bicep  --file ./scripts/templates/main.bicep --out ./scripts/azuredeploy.json
+            az bicep  --file ./templates/main.bicep --out ./templates/azuredeploy.json
