@@ -5,12 +5,14 @@ import java.util.Properties;
 
 import org.springframework.boot.actuate.info.Info.Builder;
 import org.springframework.boot.actuate.info.InfoContributor;
+import org.springframework.web.bind.annotation.RestController;
 
 import app.demo.todo.utils.AppLogger;
 
 // BOOT-INF/classes/git.properties should exist in the .jar file
 // in some environments Actuator just does not pick it up
 // No idea why, but this is a workaround
+@RestController
 public class GitStatusInfoContributor implements InfoContributor {
     private static boolean gitInfoLoaded = false;
     private static String gitBuildTime = null;
