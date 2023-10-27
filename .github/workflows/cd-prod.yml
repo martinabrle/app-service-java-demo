@@ -1,0 +1,141 @@
+name: cd-prod
+
+# At this point, the workflow is triggered manualy. However, as the Azure
+# adoption progresses and the team gains more experience, it will be 
+# triggered automatically after some more integration tests in cd.yml
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to PRODUCTION
+    runs-on: ubuntu-latest
+    environment: PRODUCTION
+    steps:
+      - name: Azure login # https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure
+        uses: azure/login@v1
+        with:
+            client-id: ${{ secrets.AAD_CLIENT_ID }}
+            tenant-id: ${{ secrets.AAD_TENANT_ID }}
+            subscription-id: ${{ secrets.APP_SERVICE_SUBSCRIPTION_ID }}
+
+      - name: Init
+        id: init
+        run: |
+          RG_EXISTS=$(az group exists --name ${{secrets.APP_SERVICE_RESOURCE_GROUP}} --subscription ${{secrets.APP_SERVICE_SUBSCRIPTION_ID}})
+          if [[ "$RG_EXISTS" == "true" ]]; then
+            echo "ENVIRONMENT_DEPLOYED=true" >> $GITHUB_OUTPUT
+          else
+            echo "ENVIRONMENT_DEPLOYED=false" >> $GITHUB_OUTPUT
+            echo "Nothing to do here, encironment has not been deployed yet."
+            exit 1
+          fi
+          actuatorInfo=`curl -L \
+                             -X POST \
+                             -H "Accept: application/json" \
+                             https://${{secrets.APP_SERVICE_NAME}}-staging.azurewebsites.net/actuator/info`
+          version=`echo $actuatorInfo|jq ".version"`
+          
+          if [[ -z $version ]]; then
+            echo "Unable to read staging environment's version."
+            exit 1
+          fi
+          echo "STAGING_RELEASE_VERSION=${version}" >> $GITHUB_OUTPUT
+          echo "STAGING_RELEASE_VERSION_NUMBER=v${version}" >> $GITHUB_OUTPUT
+          echo "STAGING_RELEASE_DIR_NAME=todo-${version}" >> $GITHUB_OUTPUT
+          echo "STAGING_RELEASE_ARCHIVE_NAME=todo-${version}.zip" >> $GITHUB_OUTPUT
+          echo "STAGING_RELEASE_FILE_NAME=todo-${version}.jar" >> $GITHUB_OUTPUT
+    
+      - name: Downloading the current STAGING package to run these PGSQL script against PROD
+        uses: robinraju/release-downloader@v1.7
+        with:
+          tag: "${{steps.init.outputs.STAGING_RELEASE_VERSION}}"
+          fileName: "${{steps.init.outputs.STAGING_RELEASE_ARCHIVE_NAME}}"
+      
+      - name: Check downloaded files
+        run: |
+          pwd
+          ls -la
+          if [[ ! -f "${{steps.init.outputs.STAGING_RELEASE_ARCHIVE_NAME}}" ]]; then
+            echo "'${{steps.init.outputs.STAGING_RELEASE_ARCHIVE_NAME}}' does not exist."
+            exit 1
+          fi
+      
+      - name: Unzip archive
+        run: |
+          echo "Unzipping the release archive file: '${{steps.init.outputs.STAGING_RELEASE_ARCHIVE_NAME}}'"
+          unzip ${{steps.init.outputs.STAGING_RELEASE_ARCHIVE_NAME}}
+          if [[ ! -f "${{steps.init.outputs.STAGING_RELEASE_DIR_NAME}}/${{steps.init.outputs.STAGING_RELEASE_FILE_NAME}}" ]]; then
+            echo "'${{steps.init.outputs.STAGING_RELEASE_DIR_NAME}}/${{steps.init.outputs.STAGING_RELEASE_FILE_NAME}}' does not exist."
+            exit 1
+          fi
+      
+      - name: Initialize deployment variables
+        id: vars
+        run: |
+          clientIP=`dig +short myip.opendns.com @resolver1.opendns.com.`
+          echo "DEPLOYMENT_CLIENT_IP=${clientIP}" >> $GITHUB_OUTPUT
+          echo "Client IP: $clientIP"
+
+          if [[ -z "${{secrets.DBA_GROUP_NAME}}" ]]; then
+            echo "DBA Group name is not set"
+            exit 1
+          fi
+
+          dbaGroupId=`az ad group show --group "${{secrets.DBA_GROUP_NAME}}" --query '[id]' -o tsv`
+          echo "DBA Group Name: '${{secrets.DBA_GROUP_NAME}}'"
+          echo "DBA Group Id: $dbaGroupId"
+          echo "AZURE_DBA_GROUP_ID=${dbaGroupId}" >> $GITHUB_OUTPUT
+          
+          dbAppUserName=`echo "${{secrets.APP_SERVICE_NAME}}" | tr '-' '_'`;
+          echo "DB_APP_USER_NAME=${dbAppUserName}" >> $GITHUB_OUTPUT
+          echo "App user name: $dbAppUserName"
+      
+      - name: Switch to PGSQL's Azure SubscriptionId
+        run: |
+            az account set -s "${{secrets.PGSQL_SUBSCRIPTION_ID}}" 
+      
+      - name: Add DB Firewall exception used for Schema sync
+        run: |
+          az postgres flexible-server firewall-rule create --rule-name "AllowDeploymentClientIP" -g ${{secrets.PGSQL_RESOURCE_GROUP}} --name ${{secrets.PGSQL_NAME}} --start-ip-address ${{steps.vars.outputs.DEPLOYMENT_CLIENT_IP}} --subscription "${{secrets.PGSQL_SUBSCRIPTION_ID}}"
+      
+      - name: Synchronize DB Schema
+        run: |
+          export PGPASSWORD=`az account get-access-token --resource-type oss-rdbms --query "[accessToken]" --output tsv`
+          psql --set=sslmode=require -h ${{secrets.PGSQL_NAME}}.postgres.database.azure.com -p 5432 -d ${{secrets.DB_NAME}} -U "${{secrets.DBA_GROUP_NAME}}" --file=./${{steps.init.outputs.STAGING_RELEASE_DIR_NAME}}/scripts/db.sql -v ON_ERROR_STOP=1
+      
+      - name: Grant AppService default slot DB user rights
+        run: |
+          export PGPASSWORD=`az account get-access-token --resource-type oss-rdbms --query "[accessToken]" --output tsv`
+          ./${{steps.init.outputs.STAGING_RELEASE_DIR_NAME}}/scripts/grant_aad_app_user_rights.sh \
+                -s "${{secrets.PGSQL_NAME}}"
+                -d "${{secrets.DB_NAME_STAGING}}" \
+                -a "${{secrets.DBA_GROUP_NAME}}" \
+                -n "${{steps.vars.outputs.DB_STAGING_APP_USER_NAME}}"
+
+      - name: Remove PROD AppService Liveness probe
+        run: |
+          az webapp config set -g ${{secrets.APP_SERVICE_RESOURCE_GROUP}} -n ${{secrets.APP_SERVICE_NAME}} --generic-configurations '{"healthCheckPath": ""}' --subscription "${{secrets.APP_SERVICE_SUBSCRIPTION_ID}}"
+          sleep 180
+
+      - name: Swap STAGING and PRODUCTION
+        run:  |
+          az webapp deployment slot swap -g ${{secrets.APP_SERVICE_RESOURCE_GROUP}} --name ${{secrets.APP_SERVICE_NAME}} --slot staging --target-slot production --subscription "${{secrets.APP_SERVICE_SUBSCRIPTION_ID}}"
+          sleep 180
+
+      - name: Wait for PROD AppService to restart and warm-up after the swap
+        run: |
+          ./${{steps.init.outputs.STAGING_RELEASE_DIR_NAME}}/scripts/warm_up_wait.sh -u "https://${{secrets.APP_SERVICE_NAME}}.azurewebsites.net/actuator/health/readiness"
+
+      - name: Set PRODUCTION AppService Liveness probe
+        run: |
+          currentDateTime=`date`
+          echo "Starting the probe set-up: ${currentDateTime}"
+          az webapp config set -g ${{secrets.APP_SERVICE_RESOURCE_GROUP}} -n ${{secrets.APP_SERVICE_NAME}} --generic-configurations '{"healthCheckPath": "/actuator/health/liveness"}' --subscription "${{secrets.APP_SERVICE_SUBSCRIPTION_ID}}"
+          currentDateTime=`date`
+          echo "Finnished the probe set-up: ${currentDateTime}"
+
+      - name: Remove DB Firewall exception used for Schema sync
+        run: |
+          az postgres flexible-server firewall-rule delete --rule-name "AllowDeploymentClientIP" -g "${{secrets.PGSQL_RESOURCE_GROUP}}" --name "${{secrets.PGSQL_NAME}}" --yes --subscription "${{secrets.PGSQL_SUBSCRIPTION_ID}}"
