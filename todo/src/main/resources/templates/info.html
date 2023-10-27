@@ -9,8 +9,12 @@
   </head>
   <body>
     <h1>Demo Java API Site</h1>
-    <h3>Version: <span th:text="${version}">VERSION_STRING</span></h3>
-    <h3>Environment: <span th:text="${environment}">ENVIRONMENT_STRING</span></h3>
+    <h3>Version: <span th:text="${version}">version</span></h3>
+    <h3>git.build.time: <span th:text="${git_build_time}">git_build_time</span></h3>
+    <h3>git.build.version: <span th:text="${git_build_version}">git_build_version</span></h3>
+    <h3>git.commit.id.abbrev: <span th:text="${git_commit_id_abbrev}">git_commit_id_abbrev</span></h3>
+    <h3>git.commit.id.full: <span th:text="${git_commit_id_full}">git_commit_id_full</span></h3>
+    <h3>Environment: <span th:text="${environment}">environment</span></h3>
     <ul>
       <li><a href="/v3/api-docs/">OpenAPI documentation</a></li>
       <li><a href="/swagger-ui.html">Swagger UI</a></li>
