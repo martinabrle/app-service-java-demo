@@ -5,14 +5,14 @@ import java.util.Properties;
 
 import org.springframework.boot.actuate.info.Info.Builder;
 import org.springframework.boot.actuate.info.InfoContributor;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Component;
 
 import app.demo.todo.utils.AppLogger;
 
 // BOOT-INF/classes/git.properties should exist in the .jar file
 // in some environments Actuator just does not pick it up
 // No idea why, but this is a workaround
-@RestController
+@Component
 public class GitStatusInfoContributor implements InfoContributor {
     private static boolean gitInfoLoaded = false;
     private static String gitBuildTime = null;
@@ -69,9 +69,13 @@ public class GitStatusInfoContributor implements InfoContributor {
                 prop.load(input);
 
                 GitStatusInfoContributor.gitBuildTime = prop.getProperty("git.build.time");
+                LOGGER.debug(String.format("git.properties->git.build.time: '%s'", GitStatusInfoContributor.gitBuildTime));
                 GitStatusInfoContributor.gitBuildVersion = prop.getProperty("git.build.version");
+                LOGGER.debug(String.format("git.properties->git.build.version: '%s'", GitStatusInfoContributor.gitBuildVersion));
                 GitStatusInfoContributor.gitCommitIdAbbrev = prop.getProperty("git.commit.id.abbrev");
+                LOGGER.debug(String.format("git.properties->git.commit.id.abbrev: '%s'", GitStatusInfoContributor.gitCommitIdAbbrev));
                 GitStatusInfoContributor.gitCommitIdFull = prop.getProperty("git.commit.id.full");
+                LOGGER.debug(String.format("git.properties->git.commit.id.full: '%s'", GitStatusInfoContributor.gitCommitIdFull));
                 GitStatusInfoContributor.gitInfoLoaded = true;
             } catch (Exception ex) {
                 LOGGER.error(String.format("Git Info contributor call failed: '%s'", ex.getMessage()));
