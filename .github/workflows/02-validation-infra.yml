@@ -26,4 +26,4 @@ jobs:
     
         - name: Run basic scripts and templates validations
           run: |
-            ./az bicep  --file ./scripts/templates/main.bicep --out ./scripts/azuredeploy.json
+            az bicep  --file ./scripts/templates/main.bicep --out ./scripts/azuredeploy.json

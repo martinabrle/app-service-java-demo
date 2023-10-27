@@ -32,6 +32,7 @@ jobs:
 
         - name: Run basic code validation and unit tests
           run: |
+            cd ./todo
             export PORT=8080
             export SPRING_PROFILES_ACTIVE=local
             export SPRING_PROFILES_ACTIVE=true
