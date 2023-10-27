@@ -60,7 +60,8 @@ public class GitStatusInfoContributor implements InfoContributor {
                 try {
                     String content = readFromInputStream(input);
                     LOGGER.debug(content);
-                    if (content != null && content.length() > 0 && content.trim().startsWith("{}")) {
+                    if (content != null && content.length() > 0 && content.trim().startsWith("{")) {
+                        LOGGER.debug("Attempting to process with a json parser");
                         JSONParser jsonParser = new JSONParser(content);
                         JSONObject jsonObject = (JSONObject) jsonParser.parse();
                         String tmpGitBuildTime = jsonObject.getAsString("git.build.time");
@@ -69,25 +70,30 @@ public class GitStatusInfoContributor implements InfoContributor {
                         String tmpGitCommitIdFull = jsonObject.getAsString("git.commit.id.full");
                         if (tmpGitBuildTime != null && tmpGitBuildTime.length() > 0) {
                             GitStatusInfoContributor.gitBuildTime = tmpGitBuildTime;
+                            LOGGER.debug(String.format("git.properties->git.build.time: '%s'", GitStatusInfoContributor.gitBuildTime));
                             gitInfoLoaded = true;
                         }
                         if (tmpGitBuildVersion != null && tmpGitBuildVersion.length() > 0) {
                             GitStatusInfoContributor.gitBuildVersion = tmpGitBuildVersion;
+                            LOGGER.debug(String.format("git.properties->git.build.version: '%s'", GitStatusInfoContributor.gitBuildVersion));
                             gitInfoLoaded = true;
                         }
                         if (tmpGitCommitIdAbbrev != null && tmpGitCommitIdAbbrev.length() > 0) {
                             GitStatusInfoContributor.gitCommitIdAbbrev = tmpGitCommitIdAbbrev;
+                            LOGGER.debug(String.format("git.properties->git.commit.id.abbrev: '%s'", GitStatusInfoContributor.gitCommitIdAbbrev));
                             gitInfoLoaded = true;
                         }
                         if (tmpGitCommitIdFull != null && tmpGitCommitIdFull.length() > 0) {
                             GitStatusInfoContributor.gitCommitIdFull = tmpGitCommitIdFull;
+                            LOGGER.debug(String.format("git.properties->git.commit.id.full: '%s'", GitStatusInfoContributor.gitCommitIdFull));
                             gitInfoLoaded = true;
                         }
+                        LOGGER.debug(String.format("Finished parsing JSON"));
                     }
                 } catch (Exception ex) {
                     LOGGER.error(String.format("Reading git.properties failed: '%s'", ex.getMessage()));
                 }
-                
+
                 if (!gitInfoLoaded) {
                     LOGGER.debug("Reopening git.properties");
                     input = classLoader.getResourceAsStream("git.properties");
