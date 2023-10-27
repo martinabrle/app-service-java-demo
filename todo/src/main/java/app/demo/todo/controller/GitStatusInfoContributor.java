@@ -7,12 +7,12 @@ import java.io.InputStreamReader;
 import java.util.Properties;
 
 import org.springframework.boot.actuate.info.Info.Builder;
-import org.apache.tomcat.util.json.JSONParser;
+
 import org.springframework.boot.actuate.info.InfoContributor;
 import org.springframework.stereotype.Component;
 
 import app.demo.todo.utils.AppLogger;
-import net.minidev.json.JSONObject;
+import org.json.JSONObject;
 
 // BOOT-INF/classes/git.properties should exist in the .jar file
 // in some environments Actuator just does not pick it up
@@ -51,43 +51,69 @@ public class GitStatusInfoContributor implements InfoContributor {
         if (!GitStatusInfoContributor.gitInfoLoaded) {
             try {
                 ClassLoader classLoader = this.getClass().getClassLoader();
+            
                 InputStream input = classLoader.getResourceAsStream("git.properties");
                 if (input == null) {
                     throw new RuntimeException("Unable to find git.properties");
                 }
-
                 LOGGER.debug("Found git.properties and reading it");
                 try {
                     String content = readFromInputStream(input);
                     LOGGER.debug(content);
                     if (content != null && content.length() > 0 && content.trim().startsWith("{")) {
                         LOGGER.debug("Attempting to process with a json parser");
-                        JSONParser jsonParser = new JSONParser(content);
-                        JSONObject jsonObject = (JSONObject) jsonParser.parse();
-                        String tmpGitBuildTime = jsonObject.getAsString("git.build.time");
-                        String tmpGitBuildVersion = jsonObject.getAsString("git.build.version");
-                        String tmpGitCommitIdAbbrev = jsonObject.getAsString("git.commit.id.abbrev");
-                        String tmpGitCommitIdFull = jsonObject.getAsString("git.commit.id.full");
-                        if (tmpGitBuildTime != null && tmpGitBuildTime.length() > 0) {
-                            GitStatusInfoContributor.gitBuildTime = tmpGitBuildTime;
-                            LOGGER.debug(String.format("git.properties->git.build.time: '%s'", GitStatusInfoContributor.gitBuildTime));
-                            gitInfoLoaded = true;
+                        JSONObject jsonObject = new JSONObject(content);
+
+                        String tmpGitBuildTime = null;
+                        //git.build.time
+                        try {
+                            tmpGitBuildTime = jsonObject.getString("git.build.time");
+                            if (tmpGitBuildTime != null && tmpGitBuildTime.length() > 0) {
+                                GitStatusInfoContributor.gitBuildTime = tmpGitBuildTime;
+                                LOGGER.debug(String.format("git.properties->git.build.time: '%s'",
+                                        GitStatusInfoContributor.gitBuildTime));
+                                gitInfoLoaded = true;
+                            }
+                        } catch (Exception ex) {
+                            LOGGER.error(String.format("Reading git.properties->git.build.time failed: '%s'", ex.getMessage()));
                         }
-                        if (tmpGitBuildVersion != null && tmpGitBuildVersion.length() > 0) {
-                            GitStatusInfoContributor.gitBuildVersion = tmpGitBuildVersion;
-                            LOGGER.debug(String.format("git.properties->git.build.version: '%s'", GitStatusInfoContributor.gitBuildVersion));
-                            gitInfoLoaded = true;
+                        //git.build.version
+                        try {
+                            String tmpGitBuildVersion = jsonObject.getString("git.build.version");
+                            if (tmpGitBuildVersion != null && tmpGitBuildVersion.length() > 0) {
+                                GitStatusInfoContributor.gitBuildVersion = tmpGitBuildVersion;
+                                LOGGER.debug(String.format("git.properties->git.build.version: '%s'",
+                                        GitStatusInfoContributor.gitBuildVersion));
+                                gitInfoLoaded = true;
+                            }
+                        } catch (Exception ex) {
+                            LOGGER.error(String.format("Reading git.properties->git.build.version failed: '%s'", ex.getMessage()));
                         }
-                        if (tmpGitCommitIdAbbrev != null && tmpGitCommitIdAbbrev.length() > 0) {
-                            GitStatusInfoContributor.gitCommitIdAbbrev = tmpGitCommitIdAbbrev;
-                            LOGGER.debug(String.format("git.properties->git.commit.id.abbrev: '%s'", GitStatusInfoContributor.gitCommitIdAbbrev));
-                            gitInfoLoaded = true;
+                        //git.commit.id.abbrev
+                        try {
+                            String tmpGitCommitIdAbbrev = jsonObject.getString("git.commit.id.abbrev");
+                            if (tmpGitCommitIdAbbrev != null && tmpGitCommitIdAbbrev.length() > 0) {
+                                GitStatusInfoContributor.gitCommitIdAbbrev = tmpGitCommitIdAbbrev;
+                                LOGGER.debug(String.format("git.properties->git.commit.id.abbrev: '%s'",
+                                        GitStatusInfoContributor.gitCommitIdAbbrev));
+                                gitInfoLoaded = true;
+                            }
+                        } catch (Exception ex) {
+                            LOGGER.error(String.format("Reading git.properties->git.commit.id.abbrev failed: '%s'", ex.getMessage()));
                         }
-                        if (tmpGitCommitIdFull != null && tmpGitCommitIdFull.length() > 0) {
-                            GitStatusInfoContributor.gitCommitIdFull = tmpGitCommitIdFull;
-                            LOGGER.debug(String.format("git.properties->git.commit.id.full: '%s'", GitStatusInfoContributor.gitCommitIdFull));
-                            gitInfoLoaded = true;
+                        //git.commit.id.full
+                        try {
+                            String tmpGitCommitIdFull = jsonObject.getString("git.commit.id");
+                            if (tmpGitCommitIdFull != null && tmpGitCommitIdFull.length() > 0) {
+                                GitStatusInfoContributor.gitCommitIdFull = tmpGitCommitIdFull;
+                                LOGGER.debug(String.format("git.properties->git.commit.id: '%s'",
+                                        GitStatusInfoContributor.gitCommitIdFull));
+                                gitInfoLoaded = true;
+                            }
+                        } catch (Exception ex) {
+                            LOGGER.error(String.format("Reading git.properties->git.commit.id failed: '%s'", ex.getMessage()));
                         }
+                        
                         LOGGER.debug(String.format("Finished parsing JSON"));
                     }
                 } catch (Exception ex) {
