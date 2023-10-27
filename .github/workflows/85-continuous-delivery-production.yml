@@ -1,8 +1,8 @@
-name: cd-prod
+name: 85-Continuous-Delivery-Production
 
 # At this point, the workflow is triggered manualy. However, as the Azure
 # adoption progresses and the team gains more experience, it will be 
-# triggered automatically after some more integration tests in cd.yml
+# triggered automatically after some more integration tests in 80-continuous-delivery.yml
 
 on:
   workflow_dispatch:

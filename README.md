@@ -3,11 +3,11 @@
 
 CI/CD Status:
 
-[![continuous integration](https://github.com/martinabrle/app-service-java-demo/actions/workflows/ci.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/ci.yml)
+[![continuous integration](https://github.com/martinabrle/app-service-java-demo/actions/workflows/10-CI.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/10-CI.yml)
 
-[![continuous deployment](https://github.com/martinabrle/app-service-java-demo/actions/workflows/cd.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/cd.yml)
+[![continuous deployment](https://github.com/martinabrle/app-service-java-demo/actions/workflows/70-CD.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/70-CD.yml)
 
-[![infrastructure deployment](https://github.com/martinabrle/app-service-java-demo/actions/workflows/infra.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/infra.yml)
+[![infrastructure deployment](https://github.com/martinabrle/app-service-java-demo/actions/workflows/infra.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/99-INFRA.yml)
 
-[![production deployment](https://github.com/martinabrle/app-service-java-demo/actions/workflows/cd-prod.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/cd-prod.yml)
+[![production deployment](https://github.com/martinabrle/app-service-java-demo/actions/workflows/98-infra/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/70-CD-PRODUCTION.yml)
 
