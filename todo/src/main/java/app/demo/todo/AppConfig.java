@@ -39,6 +39,7 @@ public class AppConfig {
         String version = "Unknown";
         try {
             version = this.getClass().getPackage().getImplementationVersion();
+            LOGGER.debug(String.format("Identified version '%1'", version));
         } catch (Exception ignoreException) {
             LOGGER.error("An error has occurred while trying to retrieve the package version.");
         }

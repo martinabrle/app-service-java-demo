@@ -41,19 +41,26 @@ public class GitStatusInfoContributor implements InfoContributor {
     private void loadProperties() {
         if (!GitStatusInfoContributor.gitInfoLoaded) {
             try {
-                InputStream input = getClass().getResourceAsStream("/BOOT-INF/classes/git.properties");
+                InputStream input = this.getClass().getClassLoader().getResourceAsStream("/BOOT-INF/classes/git.properties");
                 if (input == null) {
-                    input = getClass().getResourceAsStream("/BOOT-INF/git.properties");
+                    input = this.getClass().getClassLoader().getResourceAsStream("//BOOT-INF/classes/git.properties");
                 }
                 if (input == null) {
-                    input = getClass().getResourceAsStream("git.properties");
+                    input = this.getClass().getClassLoader().getResourceAsStream("/BOOT-INF/git.properties");
                 }
                 if (input == null) {
-                    input = getClass().getResourceAsStream("/**/git.properties");
+                    input = this.getClass().getClassLoader().getResourceAsStream("//BOOT-INF/git.properties");
+                }
+                if (input == null) {
+                    input = this.getClass().getClassLoader().getResourceAsStream("git.properties");
+                }
+                if (input == null) {
+                    input = this.getClass().getClassLoader().getResourceAsStream("/**/git.properties");
                 }
                 if (input == null) {
                     throw new RuntimeException("Unable to find git.properties");
                 }
+                LOGGER.debug("Found git.properties and reading it");
 
                 Properties prop = new Properties();
 
@@ -65,7 +72,7 @@ public class GitStatusInfoContributor implements InfoContributor {
                 GitStatusInfoContributor.gitCommitIdFull = prop.getProperty("git.commit.id.full");
                 GitStatusInfoContributor.gitInfoLoaded = true;
             } catch (Exception ex) {
-                LOGGER.error("Git Info contributor called failed: ", ex);
+                LOGGER.error(String.format("Git Info contributor call failed: '%s'", ex.getMessage()));
                 GitStatusInfoContributor.gitBuildTime = "unknown";
                 GitStatusInfoContributor.gitBuildVersion = "unknown";
                 GitStatusInfoContributor.gitCommitIdAbbrev = "unknown";
