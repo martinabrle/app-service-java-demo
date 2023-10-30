@@ -61,6 +61,6 @@ You can review various springboot profiles (application*.yml) under [[./todo/src
 ```
 ./mvnw spring-boot:run
 ```
-* Open your browser and navigate to http://localhost:8080 to test the application. You can view http://localhost:8080/info to inspect more details about the application. On http://localhost:8080/actuator and http://localhost:8080/actuator/health you view health related application information, provided by Springboot's Actuator framework.
+* Open your browser and navigate to http://localhost:8080 to test the application. You can view http://localhost:8080/info to see more technical details. On http://localhost:8080/actuator and http://localhost:8080/actuator/health, you can inspect health related application information, provided by Springboot's Actuator framework.
 
 ## And now you can switch to [docs](https://github.com/martinabrle/app-service-java-demo/tree/main/docs/) directory and try deploying the app into Azure App Service, using wither manually or using CI/CD GitHub Actions.
