@@ -34,33 +34,33 @@ This is a simple Todo List demo app, built with Java 11, Springboot and Thymelea
 You can run the app locally with an in-memory H2 database for both development and testing purposes, by following the next steps:
 * Install Java 11 and Maven locally
 * Run the command line of your choice and make sure that Java 11 SDK is installed and in your path
-```
-javac -version
-```
+    ```
+    javac -version
+    ```
 * Clone the repo
-```
-git clone 
-```
+    ```
+    git clone 
+    ```
 * Change the current directory to the application's root directory
-```
-cd ./todo
-```
+    ```
+    cd ./todo
+    ```
 * Set local variables 
-```
-export PORT=8080
-export SPRING_ACTIVE_PROFILE=local
-export LOAD_DEMO_DATA=true
-```
-You can review various springboot profiles (application*.yml) under [[./todo/src/main/resources/]](./todo/src/main/resources/) to understand different deployment options.
+    ```
+    export PORT=8080
+    export SPRING_ACTIVE_PROFILE=local
+    export LOAD_DEMO_DATA=true
+    ```
+    You can review various springboot profiles (application*.yml) under [[./todo/src/main/resources/]](./todo/src/main/resources/) to understand different deployment options.
 
 * Test 
-```
-./mvnw -B clean package
-```
+    ```
+    ./mvnw -B clean package
+    ```
 * Run the application
-```
-./mvnw spring-boot:run
-```
+    ```
+    ./mvnw spring-boot:run
+    ```
 * Open your browser and navigate to http://localhost:8080 to test the application. You can view http://localhost:8080/info to see more technical details. On http://localhost:8080/actuator and http://localhost:8080/actuator/health, you can inspect health related application information, provided by Springboot's Actuator framework.
 
 ## Next steps:
