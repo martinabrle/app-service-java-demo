@@ -9,8 +9,6 @@
 
 [![30-SAST-CodeQL](https://github.com/martinabrle/app-service-java-demo/actions/workflows/30-sast-codeql.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/30-sast-codeql.yml)
 
-[![30-SAST-CodeQL](https://github.com/martinabrle/app-service-java-demo/actions/workflows/30-sast-codeql.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/30-sast-codeql.yml)
-
 [![32-SAST-Spotbugs](https://github.com/martinabrle/app-service-java-demo/actions/workflows/32-sast-spotbugs.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/32-sast-spotbugs.yml)
 
 [![32-SAST-Spotbugs](https://github.com/martinabrle/app-service-java-demo/actions/workflows/32-sast-spotbugs.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/32-sast-spotbugs.yml)
