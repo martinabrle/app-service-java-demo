@@ -1,7 +1,7 @@
 name: 50-Dependency-Review
 on:
 # dependency scan works comparing pull requests to the base branch
-  pull_request:
+  pull_request_target:
     # These types are all required for CRDA to scan pull requests correctly and securely.
     types: [ opened, synchronize, reopened, labeled, edited ]
     paths-ignore:
@@ -9,7 +9,7 @@ on:
       - '**/*.txt'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   dependency-review:
@@ -18,6 +18,12 @@ jobs:
       - name: 'Checkout Repository'
         uses: actions/checkout@v4
       - run: echo "${{ github.event_name }}"
+      # Use the dependency snapshot to detect transient dependencies
+      # https://github.com/actions/dependency-review-action/issues/595#event-10791333872
+      - name: Submit Dependency Snapshot
+        uses: advanced-security/maven-dependency-submission-action@v3
+        with:
+          directory: ${{ github.workspace }}/todo
       - name: 'Dependency Review from PR'
         if: github.event_name == 'pull_request'
         uses: actions/dependency-review-action@v3
