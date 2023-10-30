@@ -52,7 +52,7 @@ export SPRING_ACTIVE_PROFILE=local
 export LOAD_DEMO_DATA=true
 ```
 You can review various springboot profiles (application*.yml) under [[./todo/src/main/resources/]](./todo/src/main/resources/) to understand different deployment options.
-```
+
 * Test 
 ```
 ./mvnw -B clean package
