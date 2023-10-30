@@ -31,7 +31,7 @@ This is a simple Todo List demo app, built with Java 11, Springboot and Thymelea
 ## Running the app locally with H2 database
 ![Architecture Diagram](./diagrams/demo-app-local-in-memory-db.drawio.png)
 
-You can run the app locally with an in-memory H2 database for testing purposes by following the next steps:
+You can run the app locally with an in-memory H2 database for both development and testing purposes, by following the next steps:
 * Install Java 11 and Maven locally
 * Run the command line of your choice and make sure that Java 11 SDK is installed and in your path
 ```
