@@ -67,4 +67,4 @@ You can review various springboot profiles (application*.yml) under [[./todo/src
 Now you can continue in [docs](https://github.com/martinabrle/app-service-java-demo/tree/main/docs/) directory and try deploying the app into Azure App Service, either manually or using CI/CD GitHub Actions.
 
 ## Note:
-Please take time to review GitHub actions 30-* to 50-* for examples on implementing dependency scanning, static and dynamics analysis etc.
+Please review GitHub actions 30-* to 50-* for examples on implementing dependency scanning, static and dynamics analysis etc.
