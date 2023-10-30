@@ -1,4 +1,4 @@
-name: 01-Validation
+name: 01-Validation-App
   
 on:
   pull_request:
