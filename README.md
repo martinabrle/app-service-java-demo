@@ -29,7 +29,9 @@
 This is a simple Todo List demo app, built with Java 11, Springboot and Thymeleaf frameworks. It can run locally with an embeded H2 DB (no configuration needed), with a local Postgresql Database for more realistic testing, locally with a Postgresql backend in Azure or fully deployed into Azure. When deployed into Azure, it will be taking advantage of Log Analytics Workspace and Application Insights for monitoring, Keyvault for managing secrets, AppService for running the app, PostgresQL Flexible Server for storing the data in a resilient manner and GitHub Actions for CI/CD. With AppService deployment, we are using deployment slots for staging and production environments. GitHub actions in turn use just one protected environment, PRODUCTION, for a gated deployment into production. Most of the features used here work with a free tier of Azure services, so you can try it out without incurring any costs. On the Github side, majority of the features will work with a free version of GitHub Actions. Protected environments (gated PRODUCTION deployment)will only work with a public repo or with a paid version of GitHub, GitHub Enterprise.
 
 ## Running the app locally with H2 database
-You can the app locally with H2 database for testing purposes by following the next steps:
+![Architecture Diagram](./diagrams/demo-app-local-in-memory-db.drawio.png)
+
+You can run the app locally with H2 database for testing purposes by following the next steps:
 * Install Java 11 and Maven locally
 * Run the command line of your choice and make sure that Java 11 SDK is installed and in your path
 ```
