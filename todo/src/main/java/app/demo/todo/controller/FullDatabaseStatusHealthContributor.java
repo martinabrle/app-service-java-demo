@@ -10,25 +10,25 @@ import app.demo.todo.service.TodoService;
 import app.demo.todo.utils.AppLogger;
 
 @RestController
-public class DatabaseHealthContributor implements HealthIndicator {
+public class FullDatabaseStatusHealthContributor implements HealthIndicator {
 
 	@Autowired
 	private TodoService todoService;
 
-	public static final AppLogger LOGGER = new AppLogger(DatabaseHealthContributor.class);
+	public static final AppLogger LOGGER = new AppLogger(FullDatabaseStatusHealthContributor.class);
 
 	@Override
 	public Health health() {
 
-		LOGGER.debug("Database health probe called");
+		LOGGER.debug("Full Database status health probe called");
 
 		try {
 			todoService.getTodos();
 		} catch (Exception ex) {
-			LOGGER.error("Database health probe failed: ", ex);
+			LOGGER.error("Full Database status health probe failed: ", ex);
 			return Health.outOfService().withException(ex).build();
 		}
-		LOGGER.debug("Database health probe returned OK");
+		LOGGER.debug("Full Database status health probe returned OK");
 		return Health.up().build();
 	}
 }

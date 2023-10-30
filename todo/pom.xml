@@ -70,6 +70,11 @@
     </dependency>-->
     <!-- there is currently a dispute about the following "vulneribility", but the author does not want to fill-in the dispute form-->
     <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20090211</version>
+    </dependency>
+    <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <scope>runtime</scope>
@@ -111,7 +116,6 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
   <build>
     <plugins>
       <plugin>

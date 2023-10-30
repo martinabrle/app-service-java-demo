@@ -1,0 +1,32 @@
+name: 02-Validation-Infra
+  
+on:
+  pull_request:
+   paths:
+     - 'scripts/**'
+  workflow_dispatch:
+  workflow_call:
+
+
+jobs:
+  # for debugging purposes only
+  # preinit:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: "preinit"
+  #       run: |
+  #         echo "github.ref: ${{github.ref}}"
+  #         echo "github.event_name: ${{github.event_name}}"
+  #         echo "inputs.version: ${{inputs.version}} "
+
+  init:
+    defaults:
+      run:
+        working-directory: ./scripts
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v4
+    
+        - name: Run basic scripts and templates validations
+          run: |
+            az bicep  build --file ./templates/main.bicep --outfile ./templates/azuredeploy.json
