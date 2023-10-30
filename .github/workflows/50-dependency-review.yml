@@ -1,7 +1,8 @@
 name: 50-Dependency-Review
 on:
 # dependency scan works comparing pull requests to the base branch
-  pull_request_target:
+  #pull_request_target:
+  pull_request:
     # These types are all required for CRDA to scan pull requests correctly and securely.
     types: [ opened, synchronize, reopened, labeled, edited ]
     paths-ignore:
@@ -14,6 +15,10 @@ permissions:
 jobs:
   dependency-review:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # for actions/checkout to fetch code
+      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status    
     steps:
       - name: Get User Permission
         id: checkAccess
