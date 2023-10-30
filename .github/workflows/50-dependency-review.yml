@@ -20,9 +20,9 @@ jobs:
       - run: echo "${{ github.event_name }}"
       # Use the dependency snapshot to detect transient dependencies
       # https://github.com/actions/dependency-review-action/issues/595#event-10791333872
-      - name: Submit Dependency Snapshot
-        uses: advanced-security/maven-dependency-submission-action@v3
-        with:
-          directory: ${{ github.workspace }}/todo
+      # - name: Submit Dependency Snapshot
+      #   uses: advanced-security/maven-dependency-submission-action@v3
+      #   with:
+      #     directory: ${{ github.workspace }}/todo
       - name: 'Dependency Review from PR'
         uses: actions/dependency-review-action@v3
