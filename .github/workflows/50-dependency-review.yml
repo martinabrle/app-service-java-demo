@@ -23,6 +23,9 @@ jobs:
           username: ${{ github.triggering_actor }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Show the two contexts
+        run: |
+          echo "ctxt: ${{ github.sha }} pr: ${{ github.event.pull_request.head.sha }}"
       - name: Check User Permission
         if: steps.checkAccess.outputs.require-result == 'false'
         run: |
@@ -41,5 +44,6 @@ jobs:
         uses: advanced-security/maven-dependency-submission-action@v3
         with:
           directory: ${{ github.workspace }}/todo
+          
       - name: 'Dependency Review from PR'
         uses: actions/dependency-review-action@v3
