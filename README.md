@@ -3,7 +3,7 @@
 
 ## CI/CD Status:
 
-[![01-Validation](https://github.com/martinabrle/app-service-java-demo/actions/workflows/01-validation-app.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/01-validation-app.yml)
+[![01-Validation-App](https://github.com/martinabrle/app-service-java-demo/actions/workflows/01-validation-app.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/01-validation-app.yml)
 
 [![02-Validation-Infra](https://github.com/martinabrle/app-service-java-demo/actions/workflows/02-validation-infra.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/02-validation-infra.yml)
 
