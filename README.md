@@ -1,7 +1,7 @@
 # Spring Boot Todo App on App Service
 
 
-CI/CD Status:
+## CI/CD Status:
 
 [![01-Validation](https://github.com/martinabrle/app-service-java-demo/actions/workflows/01-validation-app.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/01-validation-app.yml)
 
@@ -27,11 +27,11 @@ CI/CD Status:
 
 [![98-Infra](https://github.com/martinabrle/app-service-java-demo/actions/workflows/98-infra.yml/badge.svg)](https://github.com/martinabrle/app-service-java-demo/actions/workflows/98-infra.yml)
 
-
+## Introduction
 This is a simple Todo List demo app, built with Java 11, Springboot and Thymeleaf frameworks. It can run locally with an embeded H2 DB (no configuration needed), with a local Postgresql Database for more realistic testing, locally with a Postgresql backend in Azure or fully deployed into Azure. When deployed into Azure, it will be taking advantage of Log Analytics Workspace and Application Insights for monitoring, Keyvault for managing secrets, AppService for running the app, PostgresQL Flexible Server for storing the data in a resilient manner and GitHub Actions for CI/CD. With AppService deployment, we are using deployment slots for staging and production environments. GitHub actions in turn use just one protected environment, PRODUCTION, for a gated deployment into production. Most of the features used here work with a free tier of Azure services, so you can try it out without incurring any costs. On the Github side, majority of the features will work with a free version of GitHub Actions. Protected environments (gated PRODUCTION deployment)will only work with a public repo or with a paid version of GitHub, GitHub Enterprise.
 
+## Running the app locally with H2 database
 You can the app locally with H2 database for testing purposes by following the next steps:
-
 * Install Java 11 and Maven locally
 * Run the command line of your choice and make sure that Java 11 SDK is installed and in your path
 ```
@@ -63,4 +63,4 @@ You can review various springboot profiles (application*.yml) under [[./todo/src
 ```
 * Open your browser and navigate to http://localhost:8080 to test the application. You can view http://localhost:8080/info to see more technical details. On http://localhost:8080/actuator and http://localhost:8080/actuator/health, you can inspect health related application information, provided by Springboot's Actuator framework.
 
-## And now you can switch to [docs](https://github.com/martinabrle/app-service-java-demo/tree/main/docs/) directory and try deploying the app into Azure App Service, using wither manually or using CI/CD GitHub Actions.
+### And now you can switch to [docs](https://github.com/martinabrle/app-service-java-demo/tree/main/docs/) directory and try deploying the app into Azure App Service, using wither manually or using CI/CD GitHub Actions.
