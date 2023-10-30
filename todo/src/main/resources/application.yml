@@ -18,6 +18,7 @@ spring.cloud.refresh.refreshable: false
 
 # App settings
 app.demo.todo.load-demo-data: ${LOAD_DEMO_DATA}
+app.demo.todo.environment: ${ENVIRONMENT}
 
 # Logging
 logging.level: warn

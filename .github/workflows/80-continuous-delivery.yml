@@ -1,6 +1,6 @@
-name: cd
+name: 80-Continuous-Delivery
 
-# This workflow can be folded into the CI.yml to improve performance, however, for demo purposes, I keep it separate
+# This workflow can be folded into the 10-continuous-integration.yml to improve performance, however, for demo purposes, I keep it separate
 
 # todo: for performance, it would be great to modify all the bash shell script and this deployment action to accept
 #      "--subscription" parameter in order to avoid having to call az account set -s "000-000.." too often
@@ -33,7 +33,7 @@ jobs:
 
   init:
     # when called from another workflow directly, it inherits the event name from the caller workflow
-    # (push in this case when called from ci.yml)
+    # (push in this case when called from 10-continuous-integration.yml)
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.ref, 'refs/tags/v') || ((github.event_name == 'workflow_dispatch' || github.event_name == 'workflow_call' || (github.event_name == 'push' && github.ref == 'refs/heads/main')) && startsWith(inputs.version,'v')) }} 
     outputs:

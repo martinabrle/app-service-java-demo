@@ -1,4 +1,4 @@
-name: ci
+name: 70-Continuous-Integration
 
 on:
   push:
@@ -120,6 +120,8 @@ jobs:
     
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up JDK 11
         uses: actions/setup-java@v3
@@ -142,6 +144,9 @@ jobs:
       - name: Build the .jar
         run: |
           ./mvnw clean package -DskipTests
+          ls -la ./target
+          ls -la ./target/classes/
+          cat ./target/classes/git.properties
       
       - name: Build ZIP including scripts directory
         id: create_archive
@@ -210,7 +215,7 @@ jobs:
   
   deploy:
     needs: [version, release]
-    uses: ./.github/workflows/cd.yml
+    uses: ./.github/workflows/80-continuous-delivery.yml
     with:
       version: ${{needs.version.outputs.VERSION_TAG}}
     secrets: inherit

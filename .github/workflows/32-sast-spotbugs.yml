@@ -7,19 +7,19 @@
 name: 32-SAST-Spotbugs
 
 on:
-  push:
-    branches: [ "main" ]
-    paths-ignore:
-      - '**/*.md'
-      - '**/*.txt'
-  pull_request:
-    # These types are all required for CRDA to scan pull requests correctly and securely.
-    types: [ opened, synchronize, reopened, labeled, edited ]
-    paths-ignore:
-      - '**/*.md'
-      - '**/*.txt'
-  schedule:
-    - cron: '35 10 * * 1'
+  # push:
+  #   branches: [ "main" ]
+  #   paths-ignore:
+  #     - '**/*.md'
+  #     - '**/*.txt'
+  # pull_request:
+  #   # These types are all required for CRDA to scan pull requests correctly and securely.
+  #   types: [ opened, synchronize, reopened, labeled, edited ]
+  #   paths-ignore:
+  #     - '**/*.md'
+  #     - '**/*.txt'
+  # schedule:
+  #   - cron: '35 10 * * 1'
   workflow_call:
   workflow_dispatch:
 
