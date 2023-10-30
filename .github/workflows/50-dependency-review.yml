@@ -9,7 +9,7 @@ on:
       - '**/*.txt'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   dependency-review:
@@ -18,6 +18,10 @@ jobs:
       - name: 'Checkout Repository'
         uses: actions/checkout@v4
       - run: echo "${{ github.event_name }}"
+      - name: Submit Dependency Snapshot
+        uses: advanced-security/maven-dependency-submission-action@v3
+        with:
+          directory: ${{ github.workspace }}/todo
       - name: 'Dependency Review from PR'
         if: github.event_name == 'pull_request'
         uses: actions/dependency-review-action@v3
