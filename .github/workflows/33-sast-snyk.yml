@@ -25,11 +25,28 @@ jobs:
     permissions:
         contents: read # for actions/checkout to fetch code
         security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
-        actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+        actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status        
     runs-on: ubuntu-latest
     steps:
+      - name: Get User Permission
+        id: checkAccess
+        uses: actions-cool/check-user-permission@v2
+        with:
+          require: write
+          username: ${{ github.triggering_actor }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check User Permission
+        if: steps.checkAccess.outputs.require-result == 'false'
+        run: |
+          echo "${{ github.triggering_actor }} does not have permissions on this repo."
+          echo "Current permission level is ${{ steps.checkAccess.outputs.user-permission }}"
+          echo "Job originally triggered by ${{ github.actor }}"
+          exit 1
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          ref: ${{  github.event.pull_request.head.sha }} # This is dangerous without the first access check
       - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'

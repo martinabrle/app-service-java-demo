@@ -128,6 +128,7 @@ jobs:
         with:
           java-version: '11'
           distribution: 'microsoft'
+          cache: maven
       
       - name: Set the release version
         run: |
@@ -171,7 +172,21 @@ jobs:
           path: ./todo/todo-${{env.VERSION}}.zip
           if-no-files-found: error
           retention-days: 1
-  
+
+  dependencies:
+    needs: [version, build]
+    runs-on: ubuntu-latest
+    if: ${{contains(needs.version.outputs.IS_CHANGED, true)}}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      # This action's result will be used later when checking the dependencies in phase 50
+      - name: Submit Full Dependency Snapshot
+        uses: advanced-security/maven-dependency-submission-action@v3
+        with:
+          directory: ${{ github.workspace }}/todo    
+
   release:
     # again, this can be merged into the previous job for performance gains,
     # but here I am demonstrating build artefact temporary storage between
