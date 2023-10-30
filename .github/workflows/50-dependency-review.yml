@@ -25,5 +25,4 @@ jobs:
         with:
           directory: ${{ github.workspace }}/todo
       - name: 'Dependency Review from PR'
-        if: github.event_name == 'pull_request'
         uses: actions/dependency-review-action@v3
