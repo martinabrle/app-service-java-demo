@@ -58,6 +58,9 @@ resource appServiceStagingDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings
   }
 }
 
+output outboundIpAddresses string = appService.properties.outboundIpAddresses
+output possibleOutboundIpAddresses string = appService.properties.possibleOutboundIpAddresses
+
 output appServiceId string = appService.id
 output appServiceName string = appService.name
 output appServicePrincipalId string = appService.identity.principalId
