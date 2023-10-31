@@ -116,8 +116,8 @@ jobs:
           echo "Deployment output: $deploymentOutput"
           pgsqlUpdatedFirewallRules=`echo $deploymentOutput|jq ".properties.outputs.pgsqlUpdatedFirewallRulesSet.value"` 
           echo "PGSQL_UPDATED_FIREWALL_RULES: ${pgsqlUpdatedFirewallRules}"
-          echo "PGSQL_UPDATED_FIREWALL_RULES=${pgsqlUpdatedFirewallRules}" >> $GITHUB_OUTPUT
-
+          echo "$pgsqlUpdatedFirewallRules" > ./PGSQL_UPDATED_FIREWALL_RULES.txt
+      
       # Avoid token validity issues (previous step sometimes takes too long)
       - name: Azure login # https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure
         uses: azure/login@v1
@@ -127,8 +127,9 @@ jobs:
           subscription-id: ${{ secrets.PGSQL_SUBSCRIPTION_ID }}
       - name: Remove obsolete PGSQL rules
         run: |
+          pgsqlUpdatedFirewallRules=`cat ./PGSQL_UPDATED_FIREWALL_RULES.txt`
           shellAllFirewallRuleNamesArray=`az postgres flexible-server firewall-rule list -n ${{secrets.PGSQL_NAME}} -g ${{secrets.PGSQL_RESOURCE_GROUP}} --query "[].name" -o tsv`
-          jsonUpdatedFirewallRuleNamesArray=`cat ./deploymentoutputexample.json |jq "${{steps.deployment.outputs.PGSQL_UPDATED_FIREWALL_RULES}}"`
+          jsonUpdatedFirewallRuleNamesArray=`cat ./deploymentoutputexample.json |jq "${pgsqlUpdatedFirewallRules}"`
           shellUpdatedFirewallRuleNamesArray=$jsonUpdatedFirewallRuleNamesArray| jq -r '.[]'
           for firewallRuleName in $shellFirewallRuleNamesArray;
           do
