@@ -304,4 +304,4 @@ module appServiceStagingPARMS 'components/app-service-slot-params.bicep' = {
   }
 }
 
-output pgsqlUpdatedFirewallRulesSet string = pgsql.outputs.validFirewallRules
+output pgsqlUpdatedFirewallRulesSet array = pgsql.outputs.validFirewallRules

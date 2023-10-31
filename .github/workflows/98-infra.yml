@@ -114,7 +114,8 @@ jobs:
                                                     deploymentClientIPAddress="${{steps.vars.outputs.DEPLOYMENT_CLIENT_IP}}" \
                                                     location="${{secrets.AZURE_LOCATION}}"`
           echo "Deployment output: $deploymentOutput"
-          echo "DEPLYMENT_OUTPUT=${deploymentOutput}" >> $GITHUB_OUTPUT
+          pgsqlUpdatedFirewallRules=echo $deploymentOutput|jq ".properties.outputs.pgsqlUpdatedFirewallRulesSet.value"` 
+          echo "PGSQL_UPDATED_FIREWALL_RULES=${pgsqlUpdatedFirewallRules}" >> $GITHUB_OUTPUT
 
       # Avoid token validity issues
       - name: Azure login # https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure
@@ -159,17 +160,17 @@ jobs:
             -n "${{steps.vars.outputs.DB_STAGING_APP_USER_NAME}}" \
             -o "${{steps.aad_vars.outputs.STAGING_APP_CLIENT_ID}}"
 
-      - name: Remove outdated DB Firewall rules
-        run: |
-          allFwRules=`az postgres flexible-server firewall-rule list -n ${{secrets.PGSQL_NAME}} -g ${{secrets.PGSQL_RESOURCE_GROUP}} --query "[].name" -o tsv`
-          echo "All firewall rules: $allFwRules"
+      # - name: Remove outdated DB Firewall rules
+      #   run: |
+      #     allFwRules=`az postgres flexible-server firewall-rule list -n ${{secrets.PGSQL_NAME}} -g ${{secrets.PGSQL_RESOURCE_GROUP}} --query "[].name" -o tsv`
+      #     echo "All firewall rules: $allFwRules"
 
 
-          for fwRule in ${allFwRules[@]};
-          do
-            if [[${[@]} =~ $fwRule]]
-            echo "rule: $fwRule";
-          done
+      #     for fwRule in ${allFwRules[@]};
+      #     do
+      #       if [[${[@]} =~ $fwRule]]
+      #       echo "rule: $fwRule";
+      #     done
                   
       - name: Remove DB Firewall exception used for DB setup
         run: |

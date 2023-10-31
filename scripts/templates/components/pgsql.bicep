@@ -124,9 +124,9 @@ resource postgreSQLServerDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@
   }
 }
 
-var tmpAppServiceIPs = !empty(incomingIpAddressesUniqueArray) ? map(incomingIpAddressesUniqueArray, item => 'AppService_${replace(item, '.', '_')}') : [allowAllAzureIPsFirewallRule.name]
-var tmpDeploymentClientIPAddressArray = !empty(deploymentClientIPAddress) ? [deploymentClientIPAddress] : []
+var tmpAppServiceIPs = empty(incomingIpAddressesUniqueArray) ? [allowAllAzureIPsFirewallRule.name] : map(incomingIpAddressesUniqueArray, item => 'AppService_${replace(item, '.', '_')}')
+var tmpDeploymentClientIPAddressArray = empty(deploymentClientIPAddress) ? [] : [allowClientIPFirewallRule.name]
 
 var appServiceIPs = union(tmpDeploymentClientIPAddressArray, tmpAppServiceIPs)
 
-output validFirewallRules string = (!empty(appServiceIPs)) ? '${appServiceIPs},AllowDeploymentClientIP' : 'AllowAllAzureIps,AllowDeploymentClientIP'
+output validFirewallRules array = appServiceIPs
