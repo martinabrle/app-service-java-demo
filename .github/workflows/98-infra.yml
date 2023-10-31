@@ -113,7 +113,14 @@ jobs:
                          dbStagingUserName="${{steps.vars.outputs.DB_STAGING_APP_USER_NAME}}" \
                          deploymentClientIPAddress="${{steps.vars.outputs.DEPLOYMENT_CLIENT_IP}}" \
                          location="${{secrets.AZURE_LOCATION}}"
-
+      # Avoid token validity
+      - name: Azure login # https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AAD_CLIENT_ID }}
+          tenant-id: ${{ secrets.AAD_TENANT_ID }}
+          subscription-id: ${{ secrets.PGSQL_SUBSCRIPTION_ID }}
+      
       - name: Create Database
         run: |
           # When the database gets created using a script, AAD accounts gets full permissions on public schema and can assign roles
