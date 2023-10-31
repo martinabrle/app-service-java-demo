@@ -50,6 +50,8 @@ jobs:
         uses: jmservera/maven-dependency-submission-action@extend-with-sha
         with:
           directory: ${{ github.workspace }}/todo
+          sha: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.ref }}
           
       - name: 'Dependency Review from PR'
         uses: actions/dependency-review-action@v3

@@ -1,9 +1,6 @@
 name: 00-test-pr
 on:
-# dependency scan works comparing pull requests to the base branch
-  #pull_request_target:
   pull_request:
-    # These types are all required for CRDA to scan pull requests correctly and securely.
     types: [ opened, synchronize, reopened, labeled, edited ]
     paths-ignore:
       - '**/*.md'
@@ -13,7 +10,7 @@ permissions:
   contents: write
 
 jobs:
-  dependency-review:
+  test-pull-request:
     runs-on: ubuntu-latest
     permissions:
       contents: write # for actions/checkout to fetch code
@@ -23,4 +20,5 @@ jobs:
       - name: Show the two contexts
         run: |
           echo "github.ref: ${{ github.sha }}\n pull_request.head.sha: ${{ github.event.pull_request.head.sha }}\n" \
-               "github.ref: ${{ github.ref }}\n pull_request.head.ref: ${{ github.event.pull_request.head.ref }}\n"
+               "github.ref: ${{ github.ref }}\n pull_request.head.ref: ${{ github.event.pull_request.head.ref }}\n" \
+               "pull_request: ${{ github.event.pull_request }}\n"
