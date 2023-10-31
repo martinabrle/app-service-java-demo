@@ -115,7 +115,7 @@ jobs:
                                                     location="${{secrets.AZURE_LOCATION}}"`
           echo "Deployment output: $deploymentOutput"
           pgsqlUpdatedFirewallRules=`echo $deploymentOutput|jq ".properties.outputs.pgsqlUpdatedFirewallRulesSet.value"` 
-          echo $PGSQL_UPDATED_FIREWALL_RULES: {pgsqlUpdatedFirewallRules}"
+          echo "$PGSQL_UPDATED_FIREWALL_RULES: {pgsqlUpdatedFirewallRules}"
           echo "PGSQL_UPDATED_FIREWALL_RULES=${pgsqlUpdatedFirewallRules}" >> $GITHUB_OUTPUT
 
       # Avoid token validity issues
