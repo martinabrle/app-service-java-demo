@@ -67,8 +67,9 @@ resource allowClientIPFirewallRule 'Microsoft.DBforPostgreSQL/flexibleServers/fi
 }
 
 var incomingIpAddressesArray = split(incomingIpAddresses, ',')
+var incomingIpAddressesUniqueArray = union(incomingIpAddressesArray, incomingIpAddressesArray)
 
-resource allowAppServiceIPs 'Microsoft.DBforPostgreSQL/flexibleServers/firewallRules@2023-03-01-preview' = [for incomingIpAddress in incomingIpAddressesArray: {
+resource allowAppServiceIPs 'Microsoft.DBforPostgreSQL/flexibleServers/firewallRules@2023-03-01-preview' = [for incomingIpAddress in incomingIpAddressesUniqueArray: {
   name: 'AppService_${replace(incomingIpAddress, '.', '_')}'
   parent: postgreSQLServer
   properties: {
