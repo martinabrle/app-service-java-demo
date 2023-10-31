@@ -52,7 +52,7 @@ jobs:
         with:
           directory: ${{ github.workspace }}/todo
           sha: ${{ github.event.pull_request.head.sha }}
-          ref: "/ref/pull/${{ github.event.pull_request.number }}"
+          ref: "/refs/pull/${{ github.event.pull_request.number }}/merge"
           
       - name: 'Dependency Review from PR'
         uses: actions/dependency-review-action@v3
