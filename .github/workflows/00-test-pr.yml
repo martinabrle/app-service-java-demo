@@ -21,4 +21,4 @@ jobs:
         run: |
           echo "github.ref: ${{ github.sha }}\n pull_request.head.sha: ${{ github.event.pull_request.head.sha }}\n" \
                "github.ref: ${{ github.ref }}\n pull_request.head.ref: ${{ github.event.pull_request.head.ref }}\n" \
-               "pull_request: ${{ github.event.pull_request }}\n"
+               "pull_request: ${{ toJson(github.event.pull_request) }}\n"
