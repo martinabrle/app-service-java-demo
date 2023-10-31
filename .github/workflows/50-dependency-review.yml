@@ -43,11 +43,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{  github.event.pull_request.head.sha }} # This is dangerous without the first access check
+      - run: echo "${{ github.event_name }}"
       # Use the dependency snapshot to detect transient dependencies
       # https://github.com/actions/dependency-review-action/issues/595#event-10791333872
       - name: Submit Dependency Snapshot
         #uses: advanced-security/maven-dependency-submission-action@v3
-        uses: jmservera/maven-dependency-submission-action@48064680c0a2ed5311955d1689e1481c8282220d
+        uses: jmservera/maven-dependency-submission-action@extend-with-sha
         with:
           directory: ${{ github.workspace }}/todo
           sha: ${{ github.event.pull_request.head.sha }}
