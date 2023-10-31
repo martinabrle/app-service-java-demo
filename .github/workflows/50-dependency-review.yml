@@ -1,8 +1,8 @@
 name: 50-Dependency-Review
 on:
 # dependency scan works comparing pull requests to the base branch
-  #pull_request_target:
-  pull_request:
+  pull_request_target:
+  #pull_request:
     # These types are all required for CRDA to scan pull requests correctly and securely.
     types: [ opened, synchronize, reopened, labeled, edited ]
     paths-ignore:
@@ -51,7 +51,7 @@ jobs:
         with:
           directory: ${{ github.workspace }}/todo
           sha: ${{ github.event.pull_request.head.sha }}
-          ref: ${{ github.event.pull_request.head.ref }}
+          ref: "/ref/pull/${{ github.event.pull_request.number }}"
           
       - name: 'Dependency Review from PR'
         uses: actions/dependency-review-action@v3
