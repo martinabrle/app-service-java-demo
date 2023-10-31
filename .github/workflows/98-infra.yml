@@ -89,7 +89,7 @@ jobs:
           echo "Staging health check API Path: '${{steps.vars.outputs.STAGING_HEALTH_CHECK_PATH}}'"
           echo "Deployment client IP Address: '${{steps.vars.outputs.DEPLOYMENT_CLIENT_IP}}'"
                         
-          deploymentOutput = `az deployment group create \
+          deploymentOutput=`az deployment group create \
                                         --resource-group ${{secrets.APP_SERVICE_RESOURCE_GROUP}} \
                                         --template-file ./templates/main.bicep \
                                         --parameters appServiceName="${{secrets.APP_SERVICE_NAME}}" \
