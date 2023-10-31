@@ -130,12 +130,12 @@ jobs:
           jsonUpdatedFirewallRuleNamesArray=`cat ./PGSQL_UPDATED_FIREWALL_RULES.txt`
           echo "jsonUpdatedFirewallRuleNamesArray: $jsonUpdatedFirewallRuleNamesArray"
 
-          shellUpdatedFirewallRuleNamesArray=$jsonUpdatedFirewallRuleNamesArray| jq -r '.[]'
+          shellUpdatedFirewallRuleNamesArray=echo $jsonUpdatedFirewallRuleNamesArray| jq -r '.[]'
           echo "shellUpdatedFirewallRuleNamesArray: $shellUpdatedFirewallRuleNamesArray"
 
           shellAllFirewallRuleNamesArray=`az postgres flexible-server firewall-rule list -n ${{secrets.PGSQL_NAME}} -g ${{secrets.PGSQL_RESOURCE_GROUP}} --query "[].name" -o tsv`
           echo "shellAllFirewallRuleNamesArray: $shellAllFirewallRuleNamesArray"
-          
+
           for firewallRuleName in $shellFirewallRuleNamesArray;
           do
             echo "Testing Firewall rule: $shellAllFirewallRuleNamesArray"
