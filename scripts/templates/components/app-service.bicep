@@ -114,7 +114,8 @@ resource appServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-0
 //     workspaceId: logAnalyticsWorkspaceId
 //   }
 // }
-
+output outboundIpAddresses string = appService.properties.outboundIpAddresses
+output possibleOutboundIpAddresses string = appService.properties.possibleOutboundIpAddresses
 output appServiceId string = appService.id
 output appServiceName string = appService.name
 output appServicePrincipalId string = appService.identity.principalId
