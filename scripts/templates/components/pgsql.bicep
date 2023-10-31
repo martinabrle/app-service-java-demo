@@ -3,7 +3,7 @@ param name string
 param dbServerAADAdminGroupObjectId string
 param dbServerAADAdminGroupName string
 param deploymentClientIPAddress string = ''
-param incomingIpAddresses string = '1.1.1.2,3.3.3.3'
+param incomingIpAddresses string = ''
 
 param location string
 param tagsArray object
