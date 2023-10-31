@@ -119,18 +119,19 @@ jobs:
           echo "$pgsqlUpdatedFirewallRules" > ./PGSQL_UPDATED_FIREWALL_RULES.txt
       
       # Avoid token validity issues (previous step sometimes takes too long)
-      - name: Azure login # https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure
+      - name: Azure re-login # https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure
         uses: azure/login@v1
         with:
           client-id: ${{ secrets.AAD_CLIENT_ID }}
           tenant-id: ${{ secrets.AAD_TENANT_ID }}
           subscription-id: ${{ secrets.PGSQL_SUBSCRIPTION_ID }}
-      - name: Remove obsolete PGSQL rules
+      - name: Remove obsolete PGSQL firewall rules
         run: |
-          pgsqlUpdatedFirewallRules=`cat ./PGSQL_UPDATED_FIREWALL_RULES.txt`
-          shellAllFirewallRuleNamesArray=`az postgres flexible-server firewall-rule list -n ${{secrets.PGSQL_NAME}} -g ${{secrets.PGSQL_RESOURCE_GROUP}} --query "[].name" -o tsv`
-          jsonUpdatedFirewallRuleNamesArray=`cat ./deploymentoutputexample.json |jq "${pgsqlUpdatedFirewallRules}"`
+          jsonUpdatedFirewallRuleNamesArray=`cat ./PGSQL_UPDATED_FIREWALL_RULES.txt`
           shellUpdatedFirewallRuleNamesArray=$jsonUpdatedFirewallRuleNamesArray| jq -r '.[]'
+
+          shellAllFirewallRuleNamesArray=`az postgres flexible-server firewall-rule list -n ${{secrets.PGSQL_NAME}} -g ${{secrets.PGSQL_RESOURCE_GROUP}} --query "[].name" -o tsv`
+          
           for firewallRuleName in $shellFirewallRuleNamesArray;
           do
             echo "Testing Firewall rule: $shellAllFirewallRuleNamesArray"
@@ -140,7 +141,7 @@ jobs:
             fi
           done
       # Avoid token validity issues (previous step sometimes takes too long)
-      - name: Azure login # https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure
+      - name: Azure re-login # https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure
         uses: azure/login@v1
         with:
           client-id: ${{ secrets.AAD_CLIENT_ID }}
