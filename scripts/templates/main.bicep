@@ -63,6 +63,7 @@ module pgsql './components/pgsql.bicep' = {
     location: location
     tagsArray: pgsqlTagsArray
     logAnalyticsWorkspaceId: logAnalytics.outputs.logAnalyticsWorkspaceId
+    incomingIpAddresses: '${appService.outputs.outboundIpAddresses},${appServiceStagingSlot.outputs.outboundIpAddresses}'
     deploymentClientIPAddress: deploymentClientIPAddress
   }
 }
@@ -302,3 +303,5 @@ module appServiceStagingPARMS 'components/app-service-slot-params.bicep' = {
     ]
   }
 }
+
+output pgsqlUpdatedFirewallRulesSet string = pgsql.outputs.validFirewallRules

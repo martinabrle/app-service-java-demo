@@ -89,31 +89,41 @@ jobs:
           echo "Staging health check API Path: '${{steps.vars.outputs.STAGING_HEALTH_CHECK_PATH}}'"
           echo "Deployment client IP Address: '${{steps.vars.outputs.DEPLOYMENT_CLIENT_IP}}'"
                         
-          az deployment group create \
-            --resource-group ${{secrets.APP_SERVICE_RESOURCE_GROUP}} \
-            --template-file ./templates/main.bicep \
-            --parameters appServiceName="${{secrets.APP_SERVICE_NAME}}" \
-                         appServicePort=${{secrets.APP_SERVICE_PORT}} \
-                         appServiceTags="${{vars.APP_SERVICE_RESOURCE_TAGS}}" \
-                         pgsqlName="${{secrets.PGSQL_NAME}}" \
-                         pgsqlAADAdminGroupName="${{secrets.DBA_GROUP_NAME}}" \
-                         pgsqlAADAdminGroupObjectId="${{steps.vars.outputs.DBA_GROUP_ID}}" \
-                         pgsqlDbName="${{secrets.DB_NAME}}" \
-                         pgsqlStagingDbName="${{secrets.DB_NAME_STAGING}}" \
-                         pgsqlSubscriptionId="${{secrets.PGSQL_SUBSCRIPTION_ID}}" \
-                         pgsqlRG="${{secrets.PGSQL_RESOURCE_GROUP}}" \
-                         pgsqlTags="${{vars.PGSQL_RESOURCE_TAGS}}" \
-                         logAnalyticsName="${{secrets.LOG_ANALYTICS_WRKSPC_NAME}}" \
-                         logAnalyticsSubscriptionId="${{secrets.LOG_ANALYTICS_WRKSPC_SUBSCRIPTION_ID}}" \
-                         logAnalyticsRG="${{secrets.LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP}}" \
-                         logAnalyticsTags="${{vars.LOG_ANALYTICS_WRKSPC_RESOURCE_TAGS}}" \
-                         healthCheckPath="${{steps.vars.outputs.HEALTH_CHECK_PATH}}" \
-                         stagingHealthCheckPath="${{steps.vars.outputs.STAGING_HEALTH_CHECK_PATH}}" \
-                         dbUserName="${{steps.vars.outputs.DB_APP_USER_NAME}}" \
-                         dbStagingUserName="${{steps.vars.outputs.DB_STAGING_APP_USER_NAME}}" \
-                         deploymentClientIPAddress="${{steps.vars.outputs.DEPLOYMENT_CLIENT_IP}}" \
-                         location="${{secrets.AZURE_LOCATION}}"
+          deploymentOutput = `az deployment group create \
+                                        --resource-group ${{secrets.APP_SERVICE_RESOURCE_GROUP}} \
+                                        --template-file ./templates/main.bicep \
+                                        --parameters appServiceName="${{secrets.APP_SERVICE_NAME}}" \
+                                                    appServicePort=${{secrets.APP_SERVICE_PORT}} \
+                                                    appServiceTags="${{vars.APP_SERVICE_RESOURCE_TAGS}}" \
+                                                    pgsqlName="${{secrets.PGSQL_NAME}}" \
+                                                    pgsqlAADAdminGroupName="${{secrets.DBA_GROUP_NAME}}" \
+                                                    pgsqlAADAdminGroupObjectId="${{steps.vars.outputs.DBA_GROUP_ID}}" \
+                                                    pgsqlDbName="${{secrets.DB_NAME}}" \
+                                                    pgsqlStagingDbName="${{secrets.DB_NAME_STAGING}}" \
+                                                    pgsqlSubscriptionId="${{secrets.PGSQL_SUBSCRIPTION_ID}}" \
+                                                    pgsqlRG="${{secrets.PGSQL_RESOURCE_GROUP}}" \
+                                                    pgsqlTags="${{vars.PGSQL_RESOURCE_TAGS}}" \
+                                                    logAnalyticsName="${{secrets.LOG_ANALYTICS_WRKSPC_NAME}}" \
+                                                    logAnalyticsSubscriptionId="${{secrets.LOG_ANALYTICS_WRKSPC_SUBSCRIPTION_ID}}" \
+                                                    logAnalyticsRG="${{secrets.LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP}}" \
+                                                    logAnalyticsTags="${{vars.LOG_ANALYTICS_WRKSPC_RESOURCE_TAGS}}" \
+                                                    healthCheckPath="${{steps.vars.outputs.HEALTH_CHECK_PATH}}" \
+                                                    stagingHealthCheckPath="${{steps.vars.outputs.STAGING_HEALTH_CHECK_PATH}}" \
+                                                    dbUserName="${{steps.vars.outputs.DB_APP_USER_NAME}}" \
+                                                    dbStagingUserName="${{steps.vars.outputs.DB_STAGING_APP_USER_NAME}}" \
+                                                    deploymentClientIPAddress="${{steps.vars.outputs.DEPLOYMENT_CLIENT_IP}}" \
+                                                    location="${{secrets.AZURE_LOCATION}}"`
+          echo "Deployment output: $deploymentOutput"
+          echo "DEPLYMENT_OUTPUT=${deploymentOutput}" >> $GITHUB_OUTPUT
 
+      # Avoid token validity issues
+      - name: Azure login # https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AAD_CLIENT_ID }}
+          tenant-id: ${{ secrets.AAD_TENANT_ID }}
+          subscription-id: ${{ secrets.PGSQL_SUBSCRIPTION_ID }}
+      
       - name: Create Database
         run: |
           # When the database gets created using a script, AAD accounts gets full permissions on public schema and can assign roles
@@ -149,6 +159,18 @@ jobs:
             -n "${{steps.vars.outputs.DB_STAGING_APP_USER_NAME}}" \
             -o "${{steps.aad_vars.outputs.STAGING_APP_CLIENT_ID}}"
 
+      - name: Remove outdated DB Firewall rules
+        run: |
+          allFwRules=`az postgres flexible-server firewall-rule list -n ${{secrets.PGSQL_NAME}} -g ${{secrets.PGSQL_RESOURCE_GROUP}} --query "[].name" -o tsv`
+          echo "All firewall rules: $allFwRules"
+
+
+          for fwRule in ${allFwRules[@]};
+          do
+            if [[${[@]} =~ $fwRule]]
+            echo "rule: $fwRule";
+          done
+                  
       - name: Remove DB Firewall exception used for DB setup
         run: |
           az postgres flexible-server firewall-rule delete --rule-name "AllowDeploymentClientIP" -g ${{secrets.PGSQL_RESOURCE_GROUP}} --name ${{secrets.PGSQL_NAME}} --subscription "${{secrets.PGSQL_SUBSCRIPTION_ID}}" --yes
