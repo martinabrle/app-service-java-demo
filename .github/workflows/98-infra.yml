@@ -118,14 +118,33 @@ jobs:
           echo "PGSQL_UPDATED_FIREWALL_RULES: ${pgsqlUpdatedFirewallRules}"
           echo "PGSQL_UPDATED_FIREWALL_RULES=${pgsqlUpdatedFirewallRules}" >> $GITHUB_OUTPUT
 
-      # Avoid token validity issues
+      # Avoid token validity issues (previous step sometimes takes too long)
       - name: Azure login # https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure
         uses: azure/login@v1
         with:
           client-id: ${{ secrets.AAD_CLIENT_ID }}
           tenant-id: ${{ secrets.AAD_TENANT_ID }}
           subscription-id: ${{ secrets.PGSQL_SUBSCRIPTION_ID }}
-      
+      - name: Remove obsolete PGSQL rules
+        run: |
+          shellAllFirewallRuleNamesArray=`az postgres flexible-server firewall-rule list -n ${{secrets.PGSQL_NAME}} -g ${{secrets.PGSQL_RESOURCE_GROUP}} --query "[].name" -o tsv`
+          jsonUpdatedFirewallRuleNamesArray=`cat ./deploymentoutputexample.json |jq "${{steps.deployment.outputs.PGSQL_UPDATED_FIREWALL_RULES}}"`
+          shellUpdatedFirewallRuleNamesArray=$jsonUpdatedFirewallRuleNamesArray| jq -r '.[]'
+          for firewallRuleName in $shellFirewallRuleNamesArray;
+          do
+            echo "Testing Firewall rule: $shellAllFirewallRuleNamesArray"
+            if [[ ! $shellUpdatedFirewallRuleNamesArray =~ $firewallRuleName ]]; then
+              echo "Deleting firewall rule: $firewallRuleName"
+              #az postgres flexible-server firewall-rule delete --rule-name $firewallRuleName -g ${{secrets.PGSQL_RESOURCE_GROUP}} --name ${{secrets.PGSQL_NAME}} --subscription "${{secrets.PGSQL_SUBSCRIPTION_ID}}" --yes
+            fi
+          done
+      # Avoid token validity issues (previous step sometimes takes too long)
+      - name: Azure login # https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AAD_CLIENT_ID }}
+          tenant-id: ${{ secrets.AAD_TENANT_ID }}
+          subscription-id: ${{ secrets.PGSQL_SUBSCRIPTION_ID }}
       - name: Create Database
         run: |
           # When the database gets created using a script, AAD accounts gets full permissions on public schema and can assign roles
