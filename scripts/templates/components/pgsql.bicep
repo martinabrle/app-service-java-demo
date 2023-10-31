@@ -1,8 +1,14 @@
-param name string
+// Deploys PostgreSQL server with firewall rules; requires inactive rules (those not returned by this module in validFirewallRules) to be deleted by script
 
+@description('Name of the PostgreSQL database server, must be unique across Azure, as the FQDN of the server will be <name>.postgres.database.azure.com.')
+param name string
+@description('Object ID of the Azure AD group that will be the admin of the database server. Must be a valid AAD User Group Object ID.')
 param dbServerAADAdminGroupObjectId string
+@description('Name of the Azure AD group that will be the admin of the database server. Must be a valid AAD User Group name.')
 param dbServerAADAdminGroupName string
+@description('IP Address if the deployment / configuration client, for example the IP address of the Azure DevOps agent. If empty, no IP address will be allowed.')
 param deploymentClientIPAddress string = ''
+@description('Comma separated list of IP addresses to allow access to the database server. If empty, all Azure IPs will be allowed.')
 param incomingIpAddresses string = ''
 
 param location string
@@ -113,3 +119,10 @@ resource postgreSQLServerDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@
     workspaceId: logAnalyticsWorkspaceId
   }
 }
+
+var tmpAppServiceIPs = !empty(incomingIpAddressesUniqueArray) ? map(incomingIpAddressesUniqueArray, item => 'AppService_${replace(item, '.', '_')}') : [allowAllAzureIPsFirewallRule.name]
+var tmpDeploymentClientIPAddressArray = !empty(deploymentClientIPAddress) ? [deploymentClientIPAddress] : []
+
+var appServiceIPs = union(tmpDeploymentClientIPAddressArray, tmpAppServiceIPs)
+
+output validFirewallRules string = (!empty(appServiceIPs)) ? '${appServiceIPs},AllowDeploymentClientIP' : 'AllowAllAzureIps,AllowDeploymentClientIP'
