@@ -1,7 +1,7 @@
 # Spring Boot Todo App on App Service
 ## Deployment with full managed identities usage (Bicep)
 
-![Architecture Diagram](../../diagrams/tiny-java-app-service-managed-identities.png)
+![Architecture Diagram](../diagrams/demo-app-app-service-managed-identities.drawio.png)
 
 * Start the command line, clone the repo using ```git clone https://github.com/martinabrle/app-service-java-demo.git``` and change your current directory to ```app-service-java-demo/scripts``` directory:
     ```

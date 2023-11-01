@@ -1,8 +1,11 @@
 # Spring Boot Todo App on App Service
 
 ## Deploying Todo App into an App Service with Github actions (CI/CD Pipeline)
+
+![Architecture Diagram](../diagrams/demo-app-app-service-managed-identities.drawio.png)
+
 * Copy the repo's content into your personal or organizational GitHub Account
-* This limited example is not utilising *GitHub->Settings->Environments*, but for production environments, consider using multiple environments for different stages of your CI/CD pipeline and protecting these environments with approvers
+* This limited example is not utilising *GitHub->Settings->Environments* with the exception of PRODUCTION environment. PRODUCTION environment is used to demonstrate gated deployment and utilising deployment approvers.
 * Click on *GitHub->Settings->Secrets and variables->Actions->Secrets* and set the following GitHub action secrets:
 ```
 AAD_CLIENT_ID (Github federation with Azure AD)
@@ -33,7 +36,7 @@ LOG_ANALYTICS_WRKSPC_RESOURCE_TAGS
 PGSQL_RESOURCE_TAGS
 ```
 
-* Create a service principal and assigned roles needed for deploying resources, managing Key Vault secrets and assigning RBACs. You will need to assign RBACK for every subscription you are deploying into. 
+* Create a service principal and assigned roles needed for deploying resources, managing Key Vault secrets and assigning RBACs. You will need to assign RBAC for every subscription you are deploying into. The service principal will also need to have "Directory.Read" role assigned to it for the workflow to work, in this demo we will do it manually.:
 ```
 az ad sp create-for-rbac --name {YOUR_DEPLOYMENT_PRINCIPAL_NAME} --role "Key Vault Administrator" --scopes /subscriptions/{AZURE_SUBSCRIPTION_ID} --sdk-auth
 az ad sp create-for-rbac --name {YOUR_DEPLOYMENT_PRINCIPAL_NAME} --role contributor --scopes /subscriptions/{AZURE_SUBSCRIPTION_ID} --sdk-auth

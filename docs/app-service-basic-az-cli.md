@@ -1,7 +1,7 @@
 # Spring Boot Todo App on App Service
 ## Basic, simplified deployment using AZ CLI
 
-![Architecture Diagram](../../diagrams/tiny-java-app-service-basic.png)
+![Architecture Diagram](../diagrams/demo-app-app-service-basic.drawio.png)
 
 * Start the command line, clone the repo using ```git clone https://github.com/martinabrle/app-service-java-demo.git``` and change your current directory to ```app-service-java-demo/scripts``` directory:
     ```
@@ -93,6 +93,7 @@
   az webapp config appsettings set -g $AZURE_RESOURCE_GROUP -n $AZURE_APP_NAME --settings SPRING_DATASOURCE_PASSWORD=$AZURE_DB_APP_USER_PASSWORD
   az webapp config appsettings set -g $AZURE_RESOURCE_GROUP -n $AZURE_APP_NAME --settings SPRING_PROFILES_ACTIVE=azure-classic
   az webapp config appsettings set -g $AZURE_RESOURCE_GROUP -n $AZURE_APP_NAME --settings SPRING_DATASOURCE_SHOW_SQL=true
+  az webapp config appsettings set -g $AZURE_RESOURCE_GROUP -n $AZURE_APP_NAME --settings ENVIRONMENT=app-service
   ```
 
 *  Build the app using ```./mvnw clean``` and ```./mvnw build```
