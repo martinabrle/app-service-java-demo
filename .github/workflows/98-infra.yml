@@ -19,9 +19,9 @@ jobs:
       - name: Azure login # https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure
         uses: azure/login@v1
         with:
-          client-id: ${{ secrets.AAD_CLIENT_ID }}
-          tenant-id: ${{ secrets.AAD_TENANT_ID }}
-          subscription-id: ${{ secrets.APP_SERVICE_SUBSCRIPTION_ID }}
+          client-id: ${{secrets.AAD_CLIENT_ID}}
+          tenant-id: ${{secrets.AAD_TENANT_ID}}
+          subscription-id: ${{secrets.APP_SERVICE_SUBSCRIPTION_ID}}
 
       - name: Create Azure resource group
         run: |
@@ -191,18 +191,6 @@ jobs:
             -n "${{steps.vars.outputs.DB_STAGING_APP_USER_NAME}}" \
             -o "${{steps.aad_vars.outputs.STAGING_APP_CLIENT_ID}}"
 
-      # - name: Remove outdated DB Firewall rules
-      #   run: |
-      #     allFwRules=`az postgres flexible-server firewall-rule list -n ${{secrets.PGSQL_NAME}} -g ${{secrets.PGSQL_RESOURCE_GROUP}} --query "[].name" -o tsv`
-      #     echo "All firewall rules: $allFwRules"
-
-
-      #     for fwRule in ${allFwRules[@]};
-      #     do
-      #       if [[${[@]} =~ $fwRule]]
-      #       echo "rule: $fwRule";
-      #     done
-                  
       - name: Remove DB Firewall exception used for DB setup
         run: |
           az postgres flexible-server firewall-rule delete --rule-name "AllowDeploymentClientIP" -g ${{secrets.PGSQL_RESOURCE_GROUP}} --name ${{secrets.PGSQL_NAME}} --subscription "${{secrets.PGSQL_SUBSCRIPTION_ID}}" --yes

@@ -39,7 +39,7 @@ You can run the app locally with an in-memory H2 database for both development a
     ```
 * Clone the repo
     ```
-    git clone 
+    git clone https://github.com/martinabrle/app-service-java-demo.git
     ```
 * Change the current directory to the application's root directory
     ```
