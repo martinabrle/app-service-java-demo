@@ -125,23 +125,28 @@ jobs:
           client-id: ${{ secrets.AAD_CLIENT_ID }}
           tenant-id: ${{ secrets.AAD_TENANT_ID }}
           subscription-id: ${{ secrets.PGSQL_SUBSCRIPTION_ID }}
+      
       - name: Remove obsolete PGSQL firewall rules
         run: |
           jsonUpdatedFirewallRuleNamesArray=`cat ./PGSQL_UPDATED_FIREWALL_RULES.txt`
           echo "jsonUpdatedFirewallRuleNamesArray: $jsonUpdatedFirewallRuleNamesArray"
 
-          shellUpdatedFirewallRuleNamesArray=echo "$jsonUpdatedFirewallRuleNamesArray"| jq -r '.[]'
+          shellUpdatedFirewallRuleNamesArray=`echo "$jsonUpdatedFirewallRuleNamesArray"| jq -r '.[]'`
           echo "shellUpdatedFirewallRuleNamesArray: $shellUpdatedFirewallRuleNamesArray"
 
           shellAllFirewallRuleNamesArray=`az postgres flexible-server firewall-rule list -n ${{secrets.PGSQL_NAME}} -g ${{secrets.PGSQL_RESOURCE_GROUP}} --query "[].name" -o tsv`
           echo "shellAllFirewallRuleNamesArray: $shellAllFirewallRuleNamesArray"
 
-          for firewallRuleName in $shellFirewallRuleNamesArray;
+          for firewallRuleName in $shellAllFirewallRuleNamesArray;
           do
-            echo "Testing Firewall rule: $shellAllFirewallRuleNamesArray"
-            if [[ ! $shellUpdatedFirewallRuleNamesArray =~ $firewallRuleName ]]; then
-              echo "Deleting firewall rule: $firewallRuleName"
-              #az postgres flexible-server firewall-rule delete --rule-name $firewallRuleName -g ${{secrets.PGSQL_RESOURCE_GROUP}} --name ${{secrets.PGSQL_NAME}} --subscription "${{secrets.PGSQL_SUBSCRIPTION_ID}}" --yes
+            echo "Testing Firewall rule: $firewallRuleName"
+            delete="false"
+            if [[ $shellUpdatedFirewallRuleNamesArray =~ $firewallRuleName ]]; then
+              echo "Firewall rule: $firewallRuleName is still valid"
+            else
+              echo "Firewall rule: $firewallRuleName is obsolete"
+              az postgres flexible-server firewall-rule delete --rule-name $firewallRuleName -g ${{secrets.PGSQL_RESOURCE_GROUP}} --name ${{secrets.PGSQL_NAME}} --subscription "${{secrets.PGSQL_SUBSCRIPTION_ID}}" --yes
+              echo "Firewall rule: $firewallRuleName has been deleted"
             fi
           done
       # Avoid token validity issues (previous step sometimes takes too long)
