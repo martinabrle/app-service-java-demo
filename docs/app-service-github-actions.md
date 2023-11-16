@@ -54,4 +54,4 @@ az role assignment list --assignee {SERVICE_PRINCIPAL_FROM_JSON_OUTPUT} -o table
 * Run the code deployment by running *Actions->70-continuous-integration* manually; this action is defined in ```./app-service-java-demo/.github/workflows/70-continuous-integration.yml```
 * Open the app's URL (```https://${AZURE_APP_NAME}.azurewebsites.net/```) in the browser and test it by creating and reviewing tasks
 * Explore the SCM console on (```https://${AZURE_APP_NAME}.scm.azurewebsites.net/```); check logs and bash
-* Delete created resources by running *Actions->Cleanup*
+* Delete created resources by deleting all automaticcally created resource groups from Azure Portal. This will remove resources created.
