@@ -88,15 +88,6 @@ resource allowAppServiceIPs 'Microsoft.DBforPostgreSQL/flexibleServers/firewallR
   }
 }]
 
-resource allowAllIPsFirewallRule 'Microsoft.DBforPostgreSQL/flexibleServers/firewallRules@2022-03-08-preview' = {
-  name: 'AllowAllWindowsAzureIps'
-  parent: postgreSQLServer
-  properties: {
-    startIpAddress: '0.0.0.0'
-    endIpAddress: '0.0.0.0'
-  }
-}
-
 resource postgreSQLServerDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
   name: '${name}-db-logs'
   dependsOn: [

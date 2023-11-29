@@ -11,15 +11,10 @@ public class AppConfig {
     public static final AppLogger LOGGER = new AppLogger(AppConfig.class);
 
     private String loadDemoData = "false";
-    private String debugAuthToken = "false";
     private String environment = "Unknown";
 
     public void setLoadDemoData(String loadDemoData) {
         this.loadDemoData = loadDemoData;
-    }
-
-    public void setDebugAuthToken(String debugAuthToken) {
-        this.debugAuthToken = debugAuthToken;
     }
 
     public void setEnvironment(String environment) {
@@ -29,10 +24,6 @@ public class AppConfig {
 
     public boolean getLoadDemoData() {
         return loadDemoData != null && loadDemoData.toLowerCase().trim().equals("true");
-    }
-
-    public boolean getDebugAuthToken() {
-        return debugAuthToken != null && debugAuthToken.toLowerCase().trim().equals("true");
     }
 
     public String getVersion() {

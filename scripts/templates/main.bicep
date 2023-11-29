@@ -194,7 +194,7 @@ module appServiceSlotConfigNames 'components/app-service-slot-config-names.bicep
   params: {
     appServiceName: appService.outputs.appServiceName
     appSettingNames: [
-      'SPRING_DATASOURCE_URL', 'SPRING_DATASOURCE_USERNAME', 'APPLICATIONINSIGHTS_CONNECTION_STRING', 'APPINSIGHTS_INSTRUMENTATIONKEY', 'SPRING_PROFILES_ACTIVE', 'PORT', 'SPRING_DATASOURCE_SHOW_SQL', 'DEBUG_AUTH_TOKEN'
+      'SPRING_DATASOURCE_URL', 'SPRING_DATASOURCE_USERNAME', 'APPLICATIONINSIGHTS_CONNECTION_STRING', 'APPINSIGHTS_INSTRUMENTATIONKEY', 'SPRING_PROFILES_ACTIVE', 'PORT', 'SPRING_DATASOURCE_SHOW_SQL'
     ]
   }
 }
@@ -240,10 +240,6 @@ module appServicePARMS 'components/app-service-params.bicep' = {
       }
       {
         name: 'SPRING_DATASOURCE_SHOW_SQL'
-        value: 'true'
-      }
-      {
-        name: 'DEBUG_AUTH_TOKEN'
         value: 'true'
       }
     ]
@@ -294,10 +290,6 @@ module appServiceStagingPARMS 'components/app-service-slot-params.bicep' = {
       }
       {
         name: 'SPRING_DATASOURCE_SHOW_SQL'
-        value: 'true'
-      }
-      {
-        name: 'DEBUG_AUTH_TOKEN'
         value: 'true'
       }
     ]

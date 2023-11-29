@@ -9,7 +9,5 @@ spring:
     hibernate:
       ddl-auto: validate
 
-app.demo.todo.debug-auth-token: ${DEBUG_AUTH_TOKEN}
-
 azure.application-insights.instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY}
 azure.application-insights.connection-string:  ${APPLICATIONINSIGHTS_CONNECTION_STRING}

@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2022-09-25T08:45:37.340Z" agent="5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15" etag="p7lR_UxGJ1WuQkDIaDXa" version="20.3.6" type="github">
+<mxfile host="app.diagrams.net" modified="2023-11-29T14:42:23.428Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0" etag="zr86Cn3KId8_zzkbKtIE" version="22.1.5" type="device">
   <diagram id="CIYdKKqNAJBwTVAFqt9w" name="Page-1">
-    <mxGraphModel dx="1420" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1184" dy="1101" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -8,7 +8,7 @@
           <mxGeometry x="379" y="240" width="64" height="64" as="geometry" />
         </mxCell>
         <mxCell id="0QP-IHk7IyoN1cNLL2Y5-2" value="DB" style="aspect=fixed;html=1;points=[];align=center;image;fontSize=12;image=img/lib/azure2/databases/Azure_Database_PostgreSQL_Server.svg;" parent="1" vertex="1">
-          <mxGeometry x="672" y="238" width="48" height="64" as="geometry" />
+          <mxGeometry x="680" y="210" width="78" height="104" as="geometry" />
         </mxCell>
         <mxCell id="0QP-IHk7IyoN1cNLL2Y5-3" value="Application Insights" style="aspect=fixed;html=1;points=[];align=center;image;fontSize=12;image=img/lib/azure2/devops/Application_Insights.svg;" parent="1" vertex="1">
           <mxGeometry x="525" y="443.5" width="34.92" height="50" as="geometry" />
@@ -43,7 +43,7 @@
             <mxPoint x="347" y="272" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="0QP-IHk7IyoN1cNLL2Y5-14" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" edge="1">
+        <mxCell id="0QP-IHk7IyoN1cNLL2Y5-14" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.125;entryY=0.578;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" edge="1" target="0QP-IHk7IyoN1cNLL2Y5-2" source="o04dppOLbAU1CwW2dDpO-1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="444" y="270" as="sourcePoint" />
             <mxPoint x="671" y="270" as="targetPoint" />
@@ -72,8 +72,8 @@
             <mxPoint x="257" y="62" as="sourcePoint" />
             <mxPoint x="257" y="60" as="targetPoint" />
             <Array as="points">
-              <mxPoint x="747" y="60" />
-              <mxPoint x="747" y="560" />
+              <mxPoint x="770" y="60" />
+              <mxPoint x="770" y="560" />
               <mxPoint x="257" y="560" />
             </Array>
           </mxGeometry>
@@ -92,6 +92,15 @@
         </mxCell>
         <mxCell id="OqzE98QxFuoe7ZCpbJcY-1" value="GitHub Repo" style="aspect=fixed;html=1;points=[];align=center;image;fontSize=12;image=img/lib/azure2/general/Branch.svg;" parent="1" vertex="1">
           <mxGeometry x="660" y="610" width="72" height="72" as="geometry" />
+        </mxCell>
+        <mxCell id="o04dppOLbAU1CwW2dDpO-2" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" target="o04dppOLbAU1CwW2dDpO-1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="444" y="270" as="sourcePoint" />
+            <mxPoint x="671" y="270" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="o04dppOLbAU1CwW2dDpO-1" value="PGSQL&lt;br&gt;Firewall&lt;br&gt;(outgoing AppSvc IPs)" style="image;html=1;image=img/lib/clip_art/networking/Firewall_02_128x128.png" vertex="1" parent="1">
+          <mxGeometry x="597" y="236" width="50" height="70" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
