@@ -20,7 +20,17 @@
     <version.spring.cloud.azure>4.12.0</version.spring.cloud.azure>
     <spring-cloud.version>2021.0.8</spring-cloud.version>
   </properties>
+
   <dependencies>
+    <!--dangerous dep-->
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-crypto</artifactId>
+      <version>5.4.2</version>
+      <!-- runtime only -->
+      <scope>runtime</scope>
+    </dependency>
+
     <dependency>
       <groupId>com.azure.spring</groupId>
       <artifactId>spring-cloud-azure-starter-jdbc-postgresql</artifactId>
