@@ -18,7 +18,7 @@
   <properties>
     <java.version>11</java.version>
     <version.spring.cloud.azure>4.12.0</version.spring.cloud.azure>
-    <spring-cloud.version>2021.0.8</spring-cloud.version>
+    <spring-cloud.version>2023.0.0</spring-cloud.version>
   </properties>
   <dependencies>
     <dependency>
